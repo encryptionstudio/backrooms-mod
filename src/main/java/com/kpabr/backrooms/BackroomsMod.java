@@ -3,13 +3,19 @@ package com.kpabr.backrooms;
 import com.kpabr.backrooms.component.WretchedComponent;
 import com.kpabr.backrooms.config.BackroomsConfig;
 import com.kpabr.backrooms.init.*;
+import com.mojang.brigadier.arguments.FloatArgumentType;
+
 import name.trimsky.lib_ai.LibAI;
 import name.trimsky.lib_ai.example.LibAIMod;
 import net.fabricmc.api.ModInitializer;
+import net.fabricmc.fabric.api.command.v1.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
+import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.entity.SpawnReason;
 import net.minecraft.entity.effect.StatusEffectInstance;
+import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.text.LiteralText;
 import net.minecraft.util.Identifier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,8 +44,53 @@ public class BackroomsMod implements ModInitializer {
 		BackroomsItems.init();
 		BackroomsEntities.init();
 		BackroomsLevels.init();
+		BackroomsShaders.init();
 
 		LOGGER.info("Backrooms mod was loaded!");
+
+		// only for debug
+        if (FabricLoader.getInstance().isDevelopmentEnvironment()) {
+			CommandRegistrationCallback.EVENT.register((dispatcher, dedicated) -> {
+            dispatcher.register(CommandManager.literal("toggleBrightnessShader")
+                    .executes(context -> {
+						if(BackroomsShaders.getRenderDark()) {
+                            BackroomsShaders.setRenderDark(false);
+							context.getSource().getPlayer().sendMessage(new LiteralText("Set to false"), false);
+						} else {
+                            BackroomsShaders.setRenderDark(true);
+							context.getSource().getPlayer().sendMessage(new LiteralText("Set to true"), false);
+						}
+                        return 1;
+                    }));
+        });
+
+		CommandRegistrationCallback.EVENT.register((dispatcher, dedicated) -> {
+            dispatcher.register(CommandManager.literal("setRenderBrightness")
+                    .then(CommandManager.argument("brightness", FloatArgumentType.floatArg())
+                            .executes(context -> {
+                                float value = FloatArgumentType.getFloat(context, "brightness");
+								BackroomsShaders.setBrightness(value);
+                                context.getSource().getPlayer().sendMessage(new LiteralText("Set to: " + value), false);
+                                return 1;
+                            })
+                    )
+            );
+        });
+
+		CommandRegistrationCallback.EVENT.register((dispatcher, dedicated) -> {
+            dispatcher.register(CommandManager.literal("setBloomIntensity")
+                    .then(CommandManager.argument("intensity", FloatArgumentType.floatArg())
+                            .executes(context -> {
+                                float value = FloatArgumentType.getFloat(context, "intensity");
+								BackroomsShaders.setBloomIntensity(value);
+                                context.getSource().getPlayer().sendMessage(new LiteralText("Set to: " + value), false);
+                                return 1;
+                            })
+                    )
+            );
+        });
+		}
+
 		// registering every tick event
 		ServerTickEvents.END_SERVER_TICK.register((server) -> {
 
