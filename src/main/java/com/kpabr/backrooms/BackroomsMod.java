@@ -1,23 +1,16 @@
 package com.kpabr.backrooms;
 
-
-import com.kpabr.backrooms.client.render.sky.StrongLiminalShader;
 import com.kpabr.backrooms.component.WretchedComponent;
 import com.kpabr.backrooms.config.BackroomsConfig;
 import com.kpabr.backrooms.init.*;
 import name.trimsky.lib_ai.LibAI;
 import name.trimsky.lib_ai.example.LibAIMod;
 import net.fabricmc.api.ModInitializer;
-import com.kpabr.backrooms.init.BackroomsBlocks;
-import com.kpabr.backrooms.init.BackroomsGroups;
-import com.kpabr.backrooms.init.BackroomsItems;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
-import net.ludocrypt.limlib.impl.LimlibRegistries;
 import net.minecraft.entity.SpawnReason;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.registry.Registry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import software.bernie.example.GeckoLibMod;
@@ -34,6 +27,7 @@ public class BackroomsMod implements ModInitializer {
 		LibAI.initialize();
 
 		BackroomsConfig.init();
+		BackroomsGamerules.init();
 		BackroomsSounds.init();
 		BackroomsParticles.init();
 		BackroomStatusEffects.init();
@@ -44,7 +38,7 @@ public class BackroomsMod implements ModInitializer {
 		BackroomsItems.init();
 		BackroomsEntities.init();
 		BackroomsLevels.init();
-		Registry.register(LimlibRegistries.LIMINAL_SHADER_APPLIER, id("strong_simple_shader"), StrongLiminalShader.CODEC);
+
 		LOGGER.info("Backrooms mod was loaded!");
 		// registering every tick event
 		ServerTickEvents.END_SERVER_TICK.register((server) -> {
@@ -56,7 +50,7 @@ public class BackroomsMod implements ModInitializer {
                     applyWretchedCycle(player);
 				}
 			}
-		});
+        });
 	}
 
 	public static Identifier id(String name) {
