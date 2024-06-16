@@ -29,8 +29,6 @@ import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldView;
 
-import javax.annotation.Nullable;
-
 public class MaskBlock extends BlockWithEntity implements Wearable {
     public static final DirectionProperty FACING = HorizontalFacingBlock.FACING;
     private static final Map<Direction, VoxelShape> HARLEQUIN_OUTLINE_SHAPE = Maps.newEnumMap(ImmutableMap.of(
@@ -72,7 +70,7 @@ public class MaskBlock extends BlockWithEntity implements Wearable {
     }
 
     @Override
-    public void afterBreak(World world, PlayerEntity player, BlockPos pos, BlockState state, @Nullable BlockEntity blockEntity, ItemStack stack) {
+    public void afterBreak(World world, PlayerEntity player, BlockPos pos, BlockState state, BlockEntity blockEntity, ItemStack stack) {
         player.incrementStat(Stats.MINED.getOrCreateStat(this));
         player.addExhaustion(0.005F);
         dropStack(world, pos, switch (maskType) {
@@ -92,7 +90,6 @@ public class MaskBlock extends BlockWithEntity implements Wearable {
     }
 
     @Override
-    @Nullable
     public BlockState getPlacementState(ItemPlacementContext ctx) {
         final Direction[] directions = ctx.getPlacementDirections();
         final World world = ctx.getWorld();
@@ -131,7 +128,6 @@ public class MaskBlock extends BlockWithEntity implements Wearable {
         return new MaskBlockEntity(pos, state);
     }
 
-    @Nullable
     public <T extends BlockEntity> BlockEntityTicker<T> getTicker(World world, BlockState state, BlockEntityType<T> type) {
         return !world.isClient ? null : checkType(type, BackroomsBlocks.MASK, MaskBlockEntity::tick);
     }

@@ -2,7 +2,7 @@ package com.kpabr.backrooms.mixins;
 
 import java.util.Iterator;
 import java.util.List;
-import java.util.Random;
+import net.minecraft.util.math.random.Random;
 
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -103,11 +103,11 @@ public class WorldRendererMixin {
 
 			List<BakedQuad> quads = Lists.newArrayList();
 			BakedModel model = ((BlockRenderManagerAccess) MinecraftClient.getInstance().getBlockRenderManager()).getModelPure(state);
-			SkyboxShaders.addAll(quads, model, state, new Random(state.getRenderingSeed(pos)));
+			SkyboxShaders.addAll(quads, model, state, Random.create(state.getRenderingSeed(pos)));
 
 			for (Direction dir : Direction.values()) {
 				if (Block.shouldDrawSide(state, world, pos, dir, pos.offset(dir))) {
-					SkyboxShaders.addAll(quads, model, state, dir, new Random(state.getRenderingSeed(pos)));
+					SkyboxShaders.addAll(quads, model, state, dir, Random.create(state.getRenderingSeed(pos)));
 				}
 			}
 
@@ -132,8 +132,7 @@ public class WorldRendererMixin {
 			matrices.pop();
 		});
 
-		bufferBuilder.end();
-		BufferRenderer.draw(bufferBuilder);
+		BufferRenderer.drawWithShader(bufferBuilder.end());
 		RenderSystem.polygonOffset(0.0F, 0.0F);
 		RenderSystem.disablePolygonOffset();
 		modelViewStack.pop();

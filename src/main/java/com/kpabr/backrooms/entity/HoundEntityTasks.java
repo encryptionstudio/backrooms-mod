@@ -5,7 +5,7 @@ import name.trimsky.lib_ai.tasks.SingleTask;
 import net.minecraft.entity.ai.FuzzyTargeting;
 import net.minecraft.entity.ai.TargetPredicate;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.text.LiteralText;
+import net.minecraft.text.Text;
 import net.minecraft.util.math.Vec3d;
 import org.jetbrains.annotations.NotNull;
 
@@ -26,7 +26,7 @@ public final class HoundEntityTasks {
 
         public IdleTask(HoundEntity owner) {
             super(owner);
-            this.owner.setAiTask(new LiteralText("Idling:Nothing"));
+            this.owner.setAiTask(Text.literal("Idling:Nothing"));
         }
 
         @Override
@@ -41,12 +41,12 @@ public final class HoundEntityTasks {
                         randomPath.x, randomPath.y, randomPath.z, SPEED_WHEN_IDLING_PER_SECOND))
                 {
                     this.owner.setAnimation(AnimationEnum.WALKING);
-                    this.owner.setAiTask(new LiteralText("Idling:Moving"));
+                    this.owner.setAiTask(Text.literal("Idling:Moving"));
                 }
                 else
                 {
                     this.owner.setAnimation(AnimationEnum.IDLING);
-                    this.owner.setAiTask(new LiteralText("Idling:Idling"));
+                    this.owner.setAiTask(Text.literal("Idling:Idling"));
                 }
             }
         }
@@ -85,7 +85,7 @@ public final class HoundEntityTasks {
             this.targetPlayer = Objects.requireNonNull(targetPlayer, "targetPlayer parameter must be not null!");
             this.cooldown = 0;
 
-            this.owner.setAiTask(new LiteralText("Attacking:Nothing"));
+            this.owner.setAiTask(Text.literal("Attacking:Nothing"));
         }
 
         @Override
@@ -123,7 +123,7 @@ public final class HoundEntityTasks {
                 if(this.owner.getNavigation().startMovingTo(this.targetPlayer, SPEED_WHEN_FOLLOWING_PER_SECOND))
                 {
                     this.owner.setAnimation(AnimationEnum.RUNNING);
-                    this.owner.setAiTask(new LiteralText("Attacking:Running"));
+                    this.owner.setAiTask(Text.literal("Attacking:Running"));
                 }
             }
         }
@@ -139,7 +139,7 @@ public final class HoundEntityTasks {
         }
         private void attackPlayer() {
             if(this.owner.tryAttack(this.targetPlayer)) {
-                this.owner.setAiTask(new LiteralText("Attacking:Attacking"));
+                this.owner.setAiTask(Text.literal("Attacking:Attacking"));
                 this.owner.playSound(
                         BackroomsSounds.HOUND_ATTACK,
                         1.0f,
@@ -166,7 +166,7 @@ public final class HoundEntityTasks {
         public SearchingPlayerTask(HoundEntity owner, PlayerEntity targetPlayer) {
             super(owner);
             this.targetPlayer = targetPlayer;
-            this.owner.setAiTask(new LiteralText("Searching"));
+            this.owner.setAiTask(Text.literal("Searching"));
         }
 
         @Override
@@ -178,7 +178,7 @@ public final class HoundEntityTasks {
                 if(this.isAnimationDone) {
                     this.controller.popState();
                 } else {
-                    this.owner.setAiTask(new LiteralText("Searching:Looking"));
+                    this.owner.setAiTask(Text.literal("Searching:Looking"));
 
                     this.owner.setAnimation(AnimationEnum.LOOKING);
                     this.owner.setAnimationCallback(

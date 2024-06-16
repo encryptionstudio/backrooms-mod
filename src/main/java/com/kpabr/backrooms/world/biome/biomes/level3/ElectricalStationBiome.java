@@ -29,7 +29,6 @@ public class ElectricalStationBiome {
                 .effects(biomeEffects.build())
 
                 .precipitation(Biome.Precipitation.NONE)
-                .category(Biome.Category.NONE)
 
                 .temperature(15.0F)
                 .downfall(0.0F);

@@ -26,6 +26,7 @@ import net.minecraft.util.registry.Registry;
 import net.minecraft.world.ChunkRegion;
 import net.minecraft.world.HeightLimitView;
 import net.minecraft.world.Heightmap;
+import net.minecraft.world.Heightmap.Type;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.source.BiomeAccess;
 import net.minecraft.world.biome.source.util.MultiNoiseUtil.MultiNoiseSampler;
@@ -35,10 +36,11 @@ import net.minecraft.world.gen.StructureAccessor;
 import net.minecraft.world.gen.chunk.Blender;
 import net.minecraft.world.gen.chunk.ChunkGenerator;
 import net.minecraft.world.gen.chunk.VerticalBlockSample;
+import net.minecraft.world.gen.noise.NoiseConfig;
 
 public class LevelThreeChunkGenerator extends ChunkGenerator {
     public static final Codec<LevelThreeChunkGenerator> CODEC = RecordCodecBuilder.create((instance) ->
-			method_41042(instance).and(
+			createStructureSetRegistryGetter(instance).and(
 				RegistryOps.createRegistryCodec(Registry.BIOME_KEY).forGetter((generator) -> generator.biomeRegistry)
 			)
 			.apply(instance, instance.stable(LevelThreeChunkGenerator::new))
@@ -57,13 +59,10 @@ public class LevelThreeChunkGenerator extends ChunkGenerator {
     protected Codec<? extends ChunkGenerator> getCodec() {
         return CODEC;
     }
-    @Override
-    public ChunkGenerator withSeed(long seed) {
-        return this;
-    }
 
     @Override
-    public CompletableFuture<Chunk> populateNoise(Executor executor, Blender blender, StructureAccessor structureAccessor, Chunk chunk) {
+    public CompletableFuture<Chunk> populateNoise(Executor executor, Blender blender, NoiseConfig noiseConfig,
+            StructureAccessor structureAccessor, Chunk chunk) {
 
         // IMPORTANT NOTE:
         // For biomes generation we're using various "placeholder" blocks to replace them later with blocks we actually need in biomes.
@@ -157,7 +156,7 @@ public class LevelThreeChunkGenerator extends ChunkGenerator {
     }
 
     @Override
-    public int getHeight(int x, int y, Heightmap.Type type, HeightLimitView world) {
+    public int getHeight(int x, int z, Type heightmap, HeightLimitView world, NoiseConfig noiseConfig) {
         return world.getTopY();
     }
 
@@ -173,28 +172,23 @@ public class LevelThreeChunkGenerator extends ChunkGenerator {
     }
 
     @Override
-    public void buildSurface(ChunkRegion region, StructureAccessor structures, Chunk chunk) {}
+    public void buildSurface(ChunkRegion region, StructureAccessor structures, NoiseConfig noiseConfig, Chunk chunk) {}
 
     @Override
-    public void carve(ChunkRegion chunkRegion, long seed, BiomeAccess biomeAccess, StructureAccessor structureAccessor,
-            Chunk chunk, Carver generationStep) {}
+    public void carve(ChunkRegion chunkRegion, long seed, NoiseConfig noiseConfig, BiomeAccess world,
+            StructureAccessor structureAccessor, Chunk chunk, Carver carverStep) {}
 
     @Override
-    public VerticalBlockSample getColumnSample(int x, int z, HeightLimitView world) {
+    public VerticalBlockSample getColumnSample(int x, int z, HeightLimitView world, NoiseConfig noiseConfig) {
         return new VerticalBlockSample(0, new BlockState[0]);
     }
 
     @Override
-    public void getDebugHudText(List<String> text, BlockPos pos) {}
+    public void getDebugHudText(List<String> text, NoiseConfig noiseConfig, BlockPos pos) {}
 
     @Override
     public int getMinimumY() {
         return 0;
-    }
-
-    @Override
-    public MultiNoiseSampler getMultiNoiseSampler() {
-        return null;
     }
 
     @Override

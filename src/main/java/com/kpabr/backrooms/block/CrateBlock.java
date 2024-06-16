@@ -1,6 +1,6 @@
 package com.kpabr.backrooms.block;
 
-import java.util.Random;
+import net.minecraft.util.math.random.Random;
 import net.minecraft.block.*;
 import com.kpabr.backrooms.block.entity.CrateBlockEntity;
 import net.minecraft.block.entity.BlockEntity;
@@ -68,10 +68,10 @@ public class CrateBlock extends BlockWithEntity implements Waterloggable {
 
     @Override
     public void scheduledTick(BlockState state, ServerWorld world, BlockPos pos, Random random) {
-        BlockEntity blockEntity = world.getBlockEntity(pos);
-        if (blockEntity instanceof CrateBlockEntity crateBlockEntity) {
-            crateBlockEntity.tick();
-        }
+                BlockEntity blockEntity = world.getBlockEntity(pos);
+                if (blockEntity instanceof CrateBlockEntity crateBlockEntity) {
+                    crateBlockEntity.tick();
+                }
     }
 
     @Override

@@ -40,10 +40,4 @@ public class LevelTwoBiomeSource extends BiomeSource{
     protected Codec<? extends BiomeSource> getCodec() {
         return CODEC;
     }
-
-    @Override
-    public BiomeSource withSeed(long seed) {
-        return this;
-    }
-    
 }

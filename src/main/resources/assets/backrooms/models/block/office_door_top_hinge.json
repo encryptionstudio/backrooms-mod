@@ -1,5 +1,5 @@
 {
-  "parent": "minecraft:block/door_top_rh",
+  "parent": "minecraft:block/door_top_right",
   "textures": {
     "top": "backrooms:block/office_door_top",
     "bottom": "backrooms:block/office_door_bottom"

@@ -26,6 +26,7 @@ import net.minecraft.util.registry.SimpleRegistry;
 import net.minecraft.world.ChunkRegion;
 import net.minecraft.world.HeightLimitView;
 import net.minecraft.world.Heightmap;
+import net.minecraft.world.Heightmap.Type;
 import net.minecraft.world.biome.source.BiomeAccess;
 import net.minecraft.world.biome.source.BiomeSource;
 import net.minecraft.world.biome.source.util.MultiNoiseUtil.MultiNoiseSampler;
@@ -35,6 +36,7 @@ import net.minecraft.world.gen.StructureAccessor;
 import net.minecraft.world.gen.chunk.Blender;
 import net.minecraft.world.gen.chunk.ChunkGenerator;
 import net.minecraft.world.gen.chunk.VerticalBlockSample;
+import net.minecraft.world.gen.noise.NoiseConfig;
 
 import java.util.HashMap;
 import java.util.List;
@@ -63,7 +65,7 @@ public class ParkingGarageChunkGenerator extends ChunkGenerator {
     
     
     public ParkingGarageChunkGenerator(BiomeSource biomeSource, long worldSeed) {
-        super(new SimpleRegistry<>(Registry.STRUCTURE_SET_KEY, Lifecycle.stable(), null), Optional.empty(), biomeSource, biomeSource, worldSeed);
+        super(new SimpleRegistry<>(Registry.STRUCTURE_SET_KEY, Lifecycle.stable(), null),Optional.empty(), biomeSource);
         this.worldSeed = worldSeed;
     }
 
@@ -71,13 +73,10 @@ public class ParkingGarageChunkGenerator extends ChunkGenerator {
     protected Codec<? extends ChunkGenerator> getCodec() {
         return CODEC;
     }
-    @Override
-    public ChunkGenerator withSeed(long seed) {
-        return new ParkingGarageChunkGenerator(this.biomeSource, seed);
-    }
 
     @Override
-    public CompletableFuture<Chunk> populateNoise(Executor executor, Blender blender, StructureAccessor structureAccessor, Chunk chunk) {
+    public CompletableFuture<Chunk> populateNoise(Executor executor, Blender blender, NoiseConfig noiseConfig,
+            StructureAccessor structureAccessor, Chunk chunk) {
         // IMPORTANT NOTE:
         // For biomes generation we're using various "placeholder" blocks to replace them later with blocks we actually need in biomes.
         // If you're adding new type of structure then don't use blocks other than described below from our mod!
@@ -221,7 +220,7 @@ public class ParkingGarageChunkGenerator extends ChunkGenerator {
     }
 
     @Override
-    public int getHeight(int x, int y, Heightmap.Type type, HeightLimitView world) {
+    public int getHeight(int x, int z, Type heightmap, HeightLimitView world, NoiseConfig noiseConfig) {
         return world.getTopY();
     }
 
@@ -230,7 +229,7 @@ public class ParkingGarageChunkGenerator extends ChunkGenerator {
     }
 
     @Override
-    public void buildSurface(ChunkRegion region, StructureAccessor structureAccessor, Chunk chunk) {
+    public void buildSurface(ChunkRegion region, StructureAccessor structures, NoiseConfig noiseConfig, Chunk chunk) {
         final ChunkPos chunkPos = chunk.getPos();
 
         // controls every block up to the roof
@@ -255,25 +254,20 @@ public class ParkingGarageChunkGenerator extends ChunkGenerator {
     }
 
      @Override
-    public void carve(ChunkRegion chunkRegion, long seed, BiomeAccess biomeAccess, StructureAccessor structureAccessor,
-            Chunk chunk, Carver generationStep) {}
+    public void carve(ChunkRegion chunkRegion, long seed, NoiseConfig noiseConfig, BiomeAccess world,
+            StructureAccessor structureAccessor, Chunk chunk, Carver carverStep) {}
 
     @Override
-    public VerticalBlockSample getColumnSample(int x, int z, HeightLimitView world) {
+    public VerticalBlockSample getColumnSample(int x, int z, HeightLimitView world, NoiseConfig noiseConfig) {
         return new VerticalBlockSample(0, new BlockState[0]);
     }
 
     @Override
-    public void getDebugHudText(List<String> text, BlockPos pos) {}
+    public void getDebugHudText(List<String> text, NoiseConfig noiseConfig, BlockPos pos) {}
 
     @Override
     public int getMinimumY() {
         return 0;
-    }
-
-    @Override
-    public MultiNoiseSampler getMultiNoiseSampler() {
-        return null;
     }
 
     @Override

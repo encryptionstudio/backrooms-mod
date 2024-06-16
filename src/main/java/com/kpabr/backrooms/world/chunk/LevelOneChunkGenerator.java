@@ -26,19 +26,23 @@ import net.minecraft.util.registry.RegistryKey;
 import net.minecraft.world.ChunkRegion;
 import net.minecraft.world.HeightLimitView;
 import net.minecraft.world.Heightmap;
+import net.minecraft.world.Heightmap.Type;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.source.BiomeAccess;
 import net.minecraft.world.biome.source.util.MultiNoiseUtil;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.gen.GenerationStep;
+import net.minecraft.world.gen.GenerationStep.Carver;
 import net.minecraft.world.gen.StructureAccessor;
 import net.minecraft.world.gen.chunk.Blender;
 import net.minecraft.world.gen.chunk.ChunkGenerator;
 import net.minecraft.world.gen.chunk.VerticalBlockSample;
+import net.minecraft.world.gen.noise.NoiseConfig;
 
 public class LevelOneChunkGenerator extends ChunkGenerator {
 	public static final Codec<LevelOneChunkGenerator> CODEC = RecordCodecBuilder.create((instance) ->
-			method_41042(instance).and(
+    ChunkGenerator.
+			createStructureSetRegistryGetter(instance).and(
 				RegistryOps.createRegistryCodec(Registry.BIOME_KEY).forGetter((generator) -> generator.biomeRegistry)
 			)
 			.apply(instance, instance.stable(LevelOneChunkGenerator::new))
@@ -70,21 +74,11 @@ public class LevelOneChunkGenerator extends ChunkGenerator {
 	}
 
 	@Override
-	public ChunkGenerator withSeed(long seed) {
-		return this;
-	}
+	public void carve(ChunkRegion chunkRegion, long seed, NoiseConfig noiseConfig, BiomeAccess world,
+            StructureAccessor structureAccessor, Chunk chunk, Carver carverStep) {}
 
 	@Override
-	public MultiNoiseUtil.MultiNoiseSampler getMultiNoiseSampler() {
-        return null;
-	}
-
-	@Override
-	public void carve(ChunkRegion chunkRegion, long l, BiomeAccess biomeAccess, StructureAccessor structureAccessor, Chunk chunk, GenerationStep.Carver carver) {
-	}
-
-	@Override
-	public void buildSurface(ChunkRegion region, StructureAccessor structureAccessor, Chunk chunk) {
+	public void buildSurface(ChunkRegion region, StructureAccessor structures, NoiseConfig noiseConfig, Chunk chunk) {
         final ChunkPos chunkPos = chunk.getPos();
 
         // controls every block up to the roof
@@ -116,7 +110,8 @@ public class LevelOneChunkGenerator extends ChunkGenerator {
 	}
 
 	@Override
-	public CompletableFuture<Chunk> populateNoise(Executor executor, Blender blender, StructureAccessor structureAccessor, Chunk chunk) {
+	public CompletableFuture<Chunk> populateNoise(Executor executor, Blender blender, NoiseConfig noiseConfig,
+            StructureAccessor structureAccessor, Chunk chunk) {
 
         if (this.cementHallsChunkGenerator == null) {
             this.cementHallsChunkGenerator = new CementHallsChunkGenerator(biomeSource, BackroomsLevels.LEVEL_1_WORLD.getSeed());
@@ -144,13 +139,13 @@ public class LevelOneChunkGenerator extends ChunkGenerator {
         final int endZ = startZ  + 16;
 
         if(isBiomeEquals(BackroomsLevels.CEMENT_WALLS_BIOME, chunk, biomePos)) {
-            this.cementHallsChunkGenerator.populateNoise(executor, blender, structureAccessor, chunk);
+            this.cementHallsChunkGenerator.populateNoise(executor, blender, noiseConfig, structureAccessor, chunk);
         }
         else if(isBiomeEquals(BackroomsLevels.PARKING_GARAGE_BIOME, chunk, biomePos)) {
-            this.parkingGarageChunkGenerator.populateNoise(executor, blender, structureAccessor, chunk);
+            this.parkingGarageChunkGenerator.populateNoise(executor, blender, noiseConfig, structureAccessor, chunk);
         }
         else if(isBiomeEquals(BackroomsLevels.WAREHOUSE_BIOME, chunk, biomePos)) {
-            this.warehouseChunkGenerator.populateNoise(executor, blender, structureAccessor, chunk);
+            this.warehouseChunkGenerator.populateNoise(executor, blender, noiseConfig, structureAccessor, chunk);
         }
 
         // Place bedrock bricks at the bottom.
@@ -186,18 +181,17 @@ public class LevelOneChunkGenerator extends ChunkGenerator {
 	}
 
 	@Override
-	public int getHeight(int x, int z, Heightmap.Type heightmapType, HeightLimitView heightLimitView) {
+	public int getHeight(int x, int z, Type heightmap, HeightLimitView world, NoiseConfig noiseConfig) {
 		return 128;
 	}
 
 	@Override
-	public VerticalBlockSample getColumnSample(int x, int z, HeightLimitView heightLimitView) {
+	public VerticalBlockSample getColumnSample(int x, int z, HeightLimitView world, NoiseConfig noiseConfig) {
 		return new VerticalBlockSample(0, new BlockState[0]);
 	}
 
 	@Override
-	public void getDebugHudText(List<String> list, BlockPos blockPos) {
-	}
+	public void getDebugHudText(List<String> text, NoiseConfig noiseConfig, BlockPos pos) {}
 
     public static int getFloorCount() {
         return 5;

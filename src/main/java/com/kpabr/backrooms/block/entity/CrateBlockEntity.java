@@ -15,12 +15,13 @@ import net.minecraft.screen.ScreenHandler;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.sound.SoundEvents;
+import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
-import net.minecraft.text.TranslatableText;
 import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3i;
+import net.minecraft.util.math.BlockPos.Mutable;
 import net.minecraft.world.World;
 
 public class CrateBlockEntity extends LootableContainerBlockEntity {
@@ -84,8 +85,8 @@ public class CrateBlockEntity extends LootableContainerBlockEntity {
         this.inventory = list;
     }
 
-    protected Text getContainerName() {
-        return new TranslatableText("container.backrooms.crate");
+    protected MutableText getContainerName() {
+        return Text.translatable("container.backrooms.crate");
     }
 
     protected ScreenHandler createScreenHandler(int syncId, PlayerInventory playerInventory) {

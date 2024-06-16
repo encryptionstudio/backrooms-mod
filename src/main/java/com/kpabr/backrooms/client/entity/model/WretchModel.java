@@ -7,17 +7,17 @@ import software.bernie.geckolib3.model.AnimatedGeoModel;
 
 public class WretchModel extends AnimatedGeoModel<WretchEntity> {
     @Override
-    public Identifier getModelLocation(WretchEntity object) {
+    public Identifier getModelResource(WretchEntity object) {
         return BackroomsMod.id("geo/entities/wretch.geo.json");
     }
 
     @Override
-    public Identifier getTextureLocation(WretchEntity object) {
+    public Identifier getTextureResource(WretchEntity object) {
         return BackroomsMod.id("textures/entity/wretch.png");
     }
 
     @Override
-    public Identifier getAnimationFileLocation(WretchEntity animatable) {
+    public Identifier getAnimationResource(WretchEntity animatable) {
         return BackroomsMod.id("animations/entities/wretch.animation.json");
     }
 }

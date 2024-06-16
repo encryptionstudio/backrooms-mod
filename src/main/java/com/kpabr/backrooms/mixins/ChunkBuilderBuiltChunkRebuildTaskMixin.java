@@ -2,7 +2,7 @@ package com.kpabr.backrooms.mixins;
 
 import java.util.Iterator;
 import java.util.List;
-import java.util.Random;
+import net.minecraft.util.math.random.Random;
 import java.util.Set;
 
 import org.spongepowered.asm.mixin.Mixin;

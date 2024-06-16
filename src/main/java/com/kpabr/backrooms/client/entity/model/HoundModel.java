@@ -8,17 +8,17 @@ import software.bernie.geckolib3.model.AnimatedGeoModel;
 public class HoundModel extends AnimatedGeoModel<HoundEntity> {
 
     @Override
-    public Identifier getModelLocation(HoundEntity object) {
+    public Identifier getModelResource(HoundEntity object) {
         return new Identifier(BackroomsMod.ModId, "geo/entities/hound.geo.json");
     }
 
     @Override
-    public Identifier getTextureLocation(HoundEntity object) {
+    public Identifier getTextureResource(HoundEntity object) {
         return new Identifier(BackroomsMod.ModId, "textures/entity/hound.png");
     }
 
     @Override
-    public Identifier getAnimationFileLocation(HoundEntity animatable) {
+    public Identifier getAnimationResource(HoundEntity animatable) {
         return new Identifier(BackroomsMod.ModId, "animations/entities/hound.animation.json");
     }
 }

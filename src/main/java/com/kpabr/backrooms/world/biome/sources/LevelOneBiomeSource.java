@@ -14,10 +14,9 @@ import net.minecraft.util.registry.RegistryEntry;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.source.BiomeSource;
 import net.minecraft.world.biome.source.util.MultiNoiseUtil.MultiNoiseSampler;
-import net.minecraft.world.gen.random.AtomicSimpleRandom;
-import net.minecraft.world.gen.random.ChunkRandom;
+import net.minecraft.util.math.random.ChunkRandom;
 
-import java.util.Random;
+import net.minecraft.util.math.random.Random;
 
 public class LevelOneBiomeSource extends BiomeSource{
 
@@ -58,7 +57,7 @@ public class LevelOneBiomeSource extends BiomeSource{
         if (!this.isNoiseInitialized) {
 
             long seed = BackroomsLevels.LEVEL_0_WORLD.getSeed();
-            Random randomGenerator = new Random(seed);
+            Random randomGenerator = Random.create(seed);
             
             // Generate five different random seeds based on the world seed
             long[] randomSeeds = new long[5];
@@ -66,15 +65,15 @@ public class LevelOneBiomeSource extends BiomeSource{
                 randomSeeds[i] = randomGenerator.nextLong();
             }
 
-            this.temperatureNoiseSampler = new SimplexNoiseSampler(new ChunkRandom(new AtomicSimpleRandom(randomSeeds[0])));
+            this.temperatureNoiseSampler = new SimplexNoiseSampler(new ChunkRandom(Random.create(randomSeeds[0])));
             
-            this.moistnessNoiseSampler = new SimplexNoiseSampler(new ChunkRandom(new AtomicSimpleRandom(randomSeeds[1])));
+            this.moistnessNoiseSampler = new SimplexNoiseSampler(new ChunkRandom(Random.create(randomSeeds[1])));
             
-            this.integrityNoiseSampler = new SimplexNoiseSampler(new ChunkRandom(new AtomicSimpleRandom(randomSeeds[2])));
+            this.integrityNoiseSampler = new SimplexNoiseSampler(new ChunkRandom(Random.create(randomSeeds[2])));
             
-            this.purityNoiseSampler = new SimplexNoiseSampler(new ChunkRandom(new AtomicSimpleRandom(randomSeeds[3])));
+            this.purityNoiseSampler = new SimplexNoiseSampler(new ChunkRandom(Random.create(randomSeeds[3])));
             
-            this.toxicityNoiseSampler = new SimplexNoiseSampler(new ChunkRandom(new AtomicSimpleRandom(randomSeeds[4])));
+            this.toxicityNoiseSampler = new SimplexNoiseSampler(new ChunkRandom(Random.create(randomSeeds[4])));
             this.isNoiseInitialized = true;
         }
         
@@ -101,10 +100,4 @@ public class LevelOneBiomeSource extends BiomeSource{
     protected Codec<? extends BiomeSource> getCodec() {
         return CODEC;
     }
-
-    @Override
-    public BiomeSource withSeed(long seed) {
-        return this;
-    }
-    
 }

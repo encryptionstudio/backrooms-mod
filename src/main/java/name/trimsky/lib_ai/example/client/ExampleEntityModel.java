@@ -11,17 +11,17 @@ public class ExampleEntityModel extends AnimatedGeoModel<ExampleEntity> {
     private static final Identifier animationId = new Identifier(LibAIMod.modID, "animations/example_entity.animation.json");
 
     @Override
-    public Identifier getModelLocation(ExampleEntity object) {
+    public Identifier getModelResource(ExampleEntity object) {
         return modelId;
     }
 
     @Override
-    public Identifier getTextureLocation(ExampleEntity object) {
+    public Identifier getTextureResource(ExampleEntity object) {
         return textureId;
     }
 
     @Override
-    public Identifier getAnimationFileLocation(ExampleEntity animatable) {
+    public Identifier getAnimationResource(ExampleEntity animatable) {
         return animationId;
     }
 }

@@ -22,16 +22,17 @@ import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.serialization.Codec;
 
-import net.fabricmc.fabric.api.command.v1.CommandRegistrationCallback;
+import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.dimension.v1.FabricDimensions;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.block.Blocks;
 import net.minecraft.command.CommandException;
+import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
-import net.minecraft.text.LiteralText;
+import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
@@ -131,19 +132,19 @@ public class BackroomsLevels {
 
         // only for debug
         if (FabricLoader.getInstance().isDevelopmentEnvironment()) {
-            CommandRegistrationCallback.EVENT.register((dispatcher, dedicated) ->
+            CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) ->
 				    dispatcher.register(literal("tp0").executes(context -> { 
                         return debugTeleport(context, LEVEL_0_WORLD_KEY);
                     })));
-            CommandRegistrationCallback.EVENT.register((dispatcher, dedicated) ->
+            CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) ->
 			    	dispatcher.register(literal("tp1").executes(context -> { 
                         return debugTeleport(context, LEVEL_1_WORLD_KEY);
                     })));
-            CommandRegistrationCallback.EVENT.register((dispatcher, dedicated) ->
+            CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) ->
 		    		dispatcher.register(literal("tp2").executes(context -> { 
                         return debugTeleport(context, LEVEL_2_WORLD_KEY);
                     })));
-            CommandRegistrationCallback.EVENT.register((dispatcher, dedicated) ->
+            CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) ->
 		    		dispatcher.register(literal("tp3").executes(context -> { 
                         return debugTeleport(context, LEVEL_3_WORLD_KEY);
                     })));
@@ -167,7 +168,7 @@ public class BackroomsLevels {
 			FabricDimensions.teleport(player, targetWorld, target);
 
 			if (player.world != targetWorld) {
-				throw new CommandException(new LiteralText("Teleportation failed!"));
+				throw new CommandException(Text.literal("Teleportation failed!"));
 			}
 
 			targetWorld.setBlockState(new BlockPos(0, 100, 0), Blocks.DIAMOND_BLOCK.getDefaultState());

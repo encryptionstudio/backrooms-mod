@@ -3,7 +3,7 @@ package com.kpabr.backrooms.client.render.sky;
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
 import java.util.List;
-import java.util.Random;
+import net.minecraft.util.math.random.Random;
 import java.util.function.Consumer;
 
 import org.lwjgl.system.MemoryStack;
@@ -28,7 +28,7 @@ public class SkyboxShaders {
 	}
 
 	public static void addAll(List<BakedQuad> list, BakedModel model, BlockState state, Direction dir) {
-		addAll(list, model, state, dir, new Random(0));
+		addAll(list, model, state, dir, Random.create(0));
 	}
 
 	public static void addAll(List<BakedQuad> list, BakedModel model, BlockState state) {
@@ -44,7 +44,7 @@ public class SkyboxShaders {
 		int j = js.length / 8;
 		MemoryStack memoryStack = MemoryStack.stackPush();
 		try {
-			ByteBuffer byteBuffer = memoryStack.malloc(VertexFormats.POSITION_COLOR_TEXTURE_LIGHT_NORMAL.getVertexSize());
+			ByteBuffer byteBuffer = memoryStack.malloc(VertexFormats.POSITION_COLOR_TEXTURE_LIGHT_NORMAL.getVertexSizeByte());
 			IntBuffer intBuffer = byteBuffer.asIntBuffer();
 
 			for (int k = 0; k < j; ++k) {

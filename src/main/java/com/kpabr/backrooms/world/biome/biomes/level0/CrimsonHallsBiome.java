@@ -30,7 +30,6 @@ public class CrimsonHallsBiome {
                 .effects(effects)
 
                 .precipitation(Biome.Precipitation.NONE)
-                .category(Biome.Category.NONE)
 
                 .temperature(0.8F)
                 .downfall(1.0F);

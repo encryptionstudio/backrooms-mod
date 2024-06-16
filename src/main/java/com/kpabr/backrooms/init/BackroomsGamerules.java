@@ -11,7 +11,7 @@ import net.minecraft.util.registry.RegistryKey;
 import net.minecraft.world.GameRules;
 import net.minecraft.world.World;
 
-import java.util.Random;
+import net.minecraft.util.math.random.Random;
 
 import net.fabricmc.fabric.api.entity.event.v1.EntitySleepEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerEntityEvents;

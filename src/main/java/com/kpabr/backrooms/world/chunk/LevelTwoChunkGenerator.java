@@ -26,6 +26,7 @@ import net.minecraft.util.registry.Registry;
 import net.minecraft.world.ChunkRegion;
 import net.minecraft.world.HeightLimitView;
 import net.minecraft.world.Heightmap;
+import net.minecraft.world.Heightmap.Type;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.source.BiomeAccess;
 import net.minecraft.world.biome.source.util.MultiNoiseUtil.MultiNoiseSampler;
@@ -35,8 +36,9 @@ import net.minecraft.world.gen.StructureAccessor;
 import net.minecraft.world.gen.chunk.Blender;
 import net.minecraft.world.gen.chunk.ChunkGenerator;
 import net.minecraft.world.gen.chunk.VerticalBlockSample;
-import net.minecraft.world.gen.random.AtomicSimpleRandom;
-import net.minecraft.world.gen.random.ChunkRandom;
+import net.minecraft.world.gen.noise.NoiseConfig;
+import net.minecraft.util.math.random.ChunkRandom;
+import net.minecraft.util.math.random.Random;
 
 import java.util.HashMap;
 import java.util.List;
@@ -48,7 +50,7 @@ public class LevelTwoChunkGenerator extends ChunkGenerator {
     
     
     public static final Codec<LevelTwoChunkGenerator> CODEC = RecordCodecBuilder.create((instance) ->
-			method_41042(instance).and(
+			createStructureSetRegistryGetter(instance).and(
 				RegistryOps.createRegistryCodec(Registry.BIOME_KEY).forGetter((generator) -> generator.biomeRegistry)
 			)
 			.apply(instance, instance.stable(LevelTwoChunkGenerator::new))
@@ -63,7 +65,7 @@ public class LevelTwoChunkGenerator extends ChunkGenerator {
     private final static int FLOOR_Y = 1;
     private SimplexNoiseSampler xPlaneNoise;
     private SimplexNoiseSampler zPlaneNoise;
-    private AtomicSimpleRandom random;
+    private Random random;
     private final static BlockState fluorescentLightOn = BackroomsBlocks.FLUORESCENT_LIGHT.getDefaultState().with(FluorescentLightBlock.LIT, true);
     private final static BlockState fluorescentLightOff = BackroomsBlocks.FLUORESCENT_LIGHT.getDefaultState().with(FluorescentLightBlock.LIT, false);
     private final static BlockState firesaltWestWallState = BackroomsBlocks.FIRESALT_CRYSTAL.getDefaultState()
@@ -91,10 +93,11 @@ public class LevelTwoChunkGenerator extends ChunkGenerator {
     }
 
     @Override
-    public CompletableFuture<Chunk> populateNoise(Executor executor, Blender blender, StructureAccessor structureAccessor, Chunk chunk) {
+    public CompletableFuture<Chunk> populateNoise(Executor executor, Blender blender, NoiseConfig noiseConfig,
+            StructureAccessor structureAccessor, Chunk chunk) {
         if (this.random == null) {
-            this.random = new AtomicSimpleRandom(BackroomsLevels.LEVEL_2_WORLD.getSeed());
-            final ChunkRandom planeRandom = new ChunkRandom(new AtomicSimpleRandom(BackroomsLevels.LEVEL_2_WORLD.getSeed()));
+            this.random = Random.create(BackroomsLevels.LEVEL_2_WORLD.getSeed());
+            final ChunkRandom planeRandom = new ChunkRandom(Random.create(BackroomsLevels.LEVEL_2_WORLD.getSeed()));
         this.xPlaneNoise = new SimplexNoiseSampler(planeRandom);
         this.zPlaneNoise = new SimplexNoiseSampler(planeRandom);
         }
@@ -397,7 +400,7 @@ public class LevelTwoChunkGenerator extends ChunkGenerator {
 	}
 
     @Override
-    public int getHeight(int var1, int var2, Heightmap.Type var3, HeightLimitView var4) {
+    public int getHeight(int x, int z, Type heightmap, HeightLimitView world, NoiseConfig noiseConfig) {
         return ROOF_Y + 5;
     }
 
@@ -508,17 +511,12 @@ public class LevelTwoChunkGenerator extends ChunkGenerator {
     }
 
     @Override
-    public ChunkGenerator withSeed(long seed) {
-        return this;
-    }
-
-    @Override
     public int getMinimumY() {
         return FLOOR_Y - 1;
     }
 
     @Override
-    public void buildSurface(ChunkRegion region, StructureAccessor structureAccessor, Chunk chunk) {
+    public void buildSurface(ChunkRegion region, StructureAccessor structures, NoiseConfig noiseConfig, Chunk chunk) {
     }
 
     private void generateNbt(Chunk region, BlockPos at, String id, BlockRotation rotation) {
@@ -540,21 +538,16 @@ public class LevelTwoChunkGenerator extends ChunkGenerator {
 	}
 
     @Override
-    public void carve(ChunkRegion chunkRegion, long seed, BiomeAccess biomeAccess, StructureAccessor structureAccessor,
-            Chunk chunk, Carver generationStep) {}
+    public void carve(ChunkRegion chunkRegion, long seed, NoiseConfig noiseConfig, BiomeAccess world,
+            StructureAccessor structureAccessor, Chunk chunk, Carver carverStep) {}
 
     @Override
-    public VerticalBlockSample getColumnSample(int x, int z, HeightLimitView world) {
+    public VerticalBlockSample getColumnSample(int x, int z, HeightLimitView world, NoiseConfig noiseConfig) {
         return new VerticalBlockSample(0, new BlockState[0]);
     }
 
     @Override
-    public void getDebugHudText(List<String> text, BlockPos pos) {}
-
-    @Override
-    public MultiNoiseSampler getMultiNoiseSampler() {
-        return null;
-    }
+    public void getDebugHudText(List<String> text, NoiseConfig noiseConfig, BlockPos pos) {}
 
     @Override
     public int getSeaLevel() {
