@@ -1,7 +1,5 @@
-
-
 plugins {
-	id 'fabric-loom' version '1.6-SNAPSHOT'
+	id 'fabric-loom' version '1.7-SNAPSHOT'
 	id 'maven-publish'
 }
 
@@ -11,11 +9,6 @@ group = project.maven_group
 base {
 	archivesName = project.archives_base_name
 }
-
-archivesBaseName = project.archives_base_name
-version = project.mod_version
-group = project.maven_group
-
 
 loom {
 	accessWidenerPath = file("src/main/resources/backrooms.accesswidener")
@@ -66,8 +59,6 @@ dependencies {
 	include "dev.onyxstudios.cardinal-components-api:cardinal-components-base:${project.cardinal_components_version}"
 	include "dev.onyxstudios.cardinal-components-api:cardinal-components-entity:${project.cardinal_components_version}"
 }
-
-
 
 processResources {
 	inputs.property "version", project.version
