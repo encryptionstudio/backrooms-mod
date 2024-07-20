@@ -3,9 +3,9 @@ package com.kpabr.backrooms.client.entity.model;
 import com.kpabr.backrooms.BackroomsMod;
 import com.kpabr.backrooms.entity.WretchEntity;
 import net.minecraft.util.Identifier;
-import software.bernie.geckolib3.model.AnimatedGeoModel;
+import software.bernie.geckolib.model.GeoModel;
 
-public class WretchModel extends AnimatedGeoModel<WretchEntity> {
+public class WretchModel extends GeoModel<WretchEntity> {
     @Override
     public Identifier getModelResource(WretchEntity object) {
         return BackroomsMod.id("geo/entities/wretch.geo.json");

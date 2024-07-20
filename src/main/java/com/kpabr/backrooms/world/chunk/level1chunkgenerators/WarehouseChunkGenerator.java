@@ -36,8 +36,9 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.registry.Registry;
-import net.minecraft.util.registry.SimpleRegistry;
+import net.minecraft.registry.Registry;
+import net.minecraft.registry.RegistryKeys;
+import net.minecraft.registry.SimpleRegistry;
 import net.minecraft.world.ChunkRegion;
 import net.minecraft.world.HeightLimitView;
 import net.minecraft.world.Heightmap;
@@ -86,7 +87,7 @@ public class WarehouseChunkGenerator extends ChunkGenerator {
     private Identifier nbtId = BackroomsMod.id("level_1");
     
     public WarehouseChunkGenerator(BiomeSource biomeSource, long worldSeed) {
-        super(new SimpleRegistry<>(Registry.STRUCTURE_SET_KEY, Lifecycle.stable(), null),Optional.empty(), biomeSource);
+        super(biomeSource);
         this.worldSeed = worldSeed;
     }
 

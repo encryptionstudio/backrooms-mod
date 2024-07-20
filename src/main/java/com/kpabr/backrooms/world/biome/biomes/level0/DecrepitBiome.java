@@ -3,6 +3,7 @@ package com.kpabr.backrooms.world.biome.biomes.level0;
 import com.kpabr.backrooms.init.BackroomsEntities;
 import com.kpabr.backrooms.init.BackroomsSounds;
 import net.minecraft.entity.SpawnGroup;
+import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.BiomeEffects;
 import net.minecraft.world.biome.GenerationSettings;
@@ -21,14 +22,14 @@ public class DecrepitBiome {
             .waterFogColor(13548960)
             .fogColor(13548960)
             .grassColor(13818488)
-            .loopSound(BackroomsSounds.HUMBUZZ_LEVEL_0);
+            .loopSound(RegistryEntry.of(BackroomsSounds.HUMBUZZ_LEVEL_0));
 
         Biome.Builder biome = new Biome.Builder()
             .spawnSettings(spawnSettings.build())
             .generationSettings(generationSettings.build())
             .effects(biomeEffects.build())
 
-            .precipitation(Biome.Precipitation.NONE)
+            .precipitation(false)
 
             .temperature(0.8F)
             .downfall(1.0F);

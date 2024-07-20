@@ -10,7 +10,8 @@ import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.SpawnGroup;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.registry.Registry;
+import net.minecraft.registry.Registries;
+import net.minecraft.registry.Registry;
 
 import java.util.ArrayList;
 
@@ -29,7 +30,7 @@ public class BackroomsEntities {
 
     public static void init() {
         for (EntityEntry entry : ENTITIES) {
-            Registry.register(Registry.ENTITY_TYPE, entry.identifier, entry.entity);
+            Registry.register(Registries.ENTITY_TYPE, entry.identifier, entry.entity);
         }
 
         FabricDefaultAttributeRegistry.register(WRETCH, WretchEntity.createWretchAttributes());

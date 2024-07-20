@@ -4,7 +4,6 @@ import com.kpabr.backrooms.component.WretchedComponent;
 import com.kpabr.backrooms.config.BackroomsConfig;
 import com.kpabr.backrooms.init.*;
 import name.trimsky.lib_ai.LibAI;
-import name.trimsky.lib_ai.example.LibAIMod;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.minecraft.entity.SpawnReason;
@@ -74,8 +73,8 @@ public class BackroomsMod implements ModInitializer {
 		if(currentWorld.equals("backrooms") && player.isAlive()) {
 			if(wretched.increment()) {
 				wretched.remove(100);
-				BackroomsEntities.WRETCH.spawn(player.getWorld(), null, null, player, player.getBlockPos(), SpawnReason.MOB_SUMMONED, false, false);
-				player.damage(BackroomsDamageSource.WRETCHED_CYCLE_DEATH, Float.MAX_VALUE);
+				BackroomsEntities.WRETCH.spawn(player.getServerWorld(), player.getBlockPos(), SpawnReason.MOB_SUMMONED);
+				player.damage(BackroomsDamageTypes.of(player.getWorld(), BackroomsDamageTypes.WRETCHED_CYCLE_DAMAGE_TYPE), Float.MAX_VALUE);
 				player.removeStatusEffect(BackroomStatusEffects.WRETCHED);
 				return;
 			}
@@ -93,10 +92,5 @@ public class BackroomsMod implements ModInitializer {
 			player.removeStatusEffect(BackroomStatusEffects.ROTTEN);
 			player.addStatusEffect(new StatusEffectInstance(BackroomStatusEffects.WRETCHED, 9999999));
 		}
-	}
-
-	static {
-		GeckoLibMod.DISABLE_IN_DEV = true;
-		LibAIMod.DISABLE_IN_DEV_ENVIRONMENT = true;
 	}
 }

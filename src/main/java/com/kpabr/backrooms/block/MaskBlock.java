@@ -11,11 +11,12 @@ import net.minecraft.block.*;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityTicker;
 import net.minecraft.block.entity.BlockEntityType;
+import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.ai.pathing.NavigationType;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.Equipment;
 import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.Wearable;
 import net.minecraft.stat.Stats;
 import net.minecraft.state.StateManager;
 import net.minecraft.state.property.DirectionProperty;
@@ -29,7 +30,7 @@ import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldView;
 
-public class MaskBlock extends BlockWithEntity implements Wearable {
+public class MaskBlock extends BlockWithEntity implements Equipment {
     public static final DirectionProperty FACING = HorizontalFacingBlock.FACING;
     private static final Map<Direction, VoxelShape> HARLEQUIN_OUTLINE_SHAPE = Maps.newEnumMap(ImmutableMap.of(
             Direction.NORTH, Block.createCuboidShape(4.0, 3.0, 14.0, 12.0, 13.0, 16.0),
@@ -158,5 +159,10 @@ public class MaskBlock extends BlockWithEntity implements Wearable {
         MaskType(String maskKey) {
             this.maskKey = maskKey;
         }
+    }
+
+    @Override
+    public EquipmentSlot getSlotType() {
+        return EquipmentSlot.HEAD;
     }
 }

@@ -48,16 +48,15 @@ public class AbstractPipeBlock extends Block implements Waterloggable{
 				.with(WATERLOGGED, blockView.getFluidState(blockPos).getFluid() == Fluids.WATER);
 	}
 
-	@SuppressWarnings("deprecation")
+	
 	public BlockState getStateForNeighborUpdate(BlockState state, Direction direction, BlockState neighborState, WorldAccess world, BlockPos pos, BlockPos neighborPos) {
 		if (state.get(WATERLOGGED)) {
-			world. createAndScheduleFluidTick(pos, Fluids.WATER, Fluids.WATER.getTickRate(world));
+			world.scheduleFluidTick(pos, Fluids.WATER, Fluids.WATER.getTickRate(world));
 		}
 		if(shouldConnect(neighborState)) return state.with(FACING_PROPERTIES.get(direction), true);
 		return super.getStateForNeighborUpdate(state, direction, neighborState, world, pos, neighborPos);
 	}
 
-	@SuppressWarnings("deprecation")
 	public BlockState rotate(BlockState state, BlockRotation rotation) {
 		return state
 				.with(FACING_PROPERTIES.get(rotation.rotate(Direction.NORTH)), state.get(NORTH))
@@ -68,7 +67,7 @@ public class AbstractPipeBlock extends Block implements Waterloggable{
 				.with(FACING_PROPERTIES.get(rotation.rotate(Direction.UP)), state.get(UP));
 	}
 
-	@SuppressWarnings("deprecation")
+	
 	public BlockState mirror(BlockState state, BlockMirror mirror) {
 		return state
 				.with(FACING_PROPERTIES.get(mirror.apply(Direction.NORTH)), state.get(NORTH))
@@ -89,7 +88,7 @@ public class AbstractPipeBlock extends Block implements Waterloggable{
 	public FluidState getFluidState(BlockState state) {
 		return state.get(WATERLOGGED) ? Fluids.WATER.getStill(false) : super.getFluidState(state);
 	}
-	@SuppressWarnings("deprecation")
+	
 	@Override
 	public VoxelShape getOutlineShape(BlockState state, BlockView view, BlockPos pos, ShapeContext ctx) {
 		VoxelShape finalShape = VoxelShapes.cuboid(0.25f, 0.25f, 0.25f, 0.75f, 0.75f, 0.75f);

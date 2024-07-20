@@ -3,6 +3,7 @@ package com.kpabr.backrooms.world.biome.biomes.level0;
 import com.kpabr.backrooms.init.BackroomsEntities;
 import com.kpabr.backrooms.init.BackroomsSounds;
 import net.minecraft.entity.SpawnGroup;
+import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.BiomeEffects;
 import net.minecraft.world.biome.GenerationSettings;
@@ -20,7 +21,7 @@ public class CrimsonHallsBiome {
         biomeEffects.waterColor(13548960);
         biomeEffects.waterFogColor(16735821);
         biomeEffects.fogColor(11548232);
-        biomeEffects.loopSound(BackroomsSounds.HUMBUZZ_LEVEL_0);
+        biomeEffects.loopSound(RegistryEntry.of(BackroomsSounds.HUMBUZZ_LEVEL_0));
         BiomeEffects effects = biomeEffects.build();
 
         // Configure crimson halls biome
@@ -29,7 +30,7 @@ public class CrimsonHallsBiome {
                 .generationSettings(generationSettings.build())
                 .effects(effects)
 
-                .precipitation(Biome.Precipitation.NONE)
+                .precipitation(false)
 
                 .temperature(0.8F)
                 .downfall(1.0F);

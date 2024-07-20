@@ -6,8 +6,10 @@ import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
-import net.minecraft.util.registry.Registry;
-import net.minecraft.util.registry.RegistryKey;
+import net.minecraft.registry.Registries;
+import net.minecraft.registry.Registry;
+import net.minecraft.registry.RegistryKey;
+import net.minecraft.registry.RegistryKeys;
 import net.minecraft.world.GameRules;
 import net.minecraft.world.World;
 
@@ -116,7 +118,7 @@ public class BackroomsGamerules {
 
         World level_0 = player.getServer().getWorld(
             RegistryKey.of(
-                    Registry.WORLD_KEY,
+                    RegistryKeys.WORLD,
                     new Identifier("backrooms:level_0")));
 
         // random position in the level

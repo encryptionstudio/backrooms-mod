@@ -17,8 +17,9 @@ import net.minecraft.util.Hand;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.registry.Registry;
-import net.minecraft.util.registry.RegistryKey;
+import net.minecraft.registry.Registry;
+import net.minecraft.registry.RegistryKey;
+import net.minecraft.registry.RegistryKeys;
 import net.minecraft.world.World;
 
 
@@ -41,7 +42,7 @@ public class PortalBlock extends Block {
         if(entity.isPlayer()) {
             World portalBlockWorld = entity.getServer().getWorld(
                     RegistryKey.of(
-                            Registry.WORLD_KEY,
+                            RegistryKeys.WORLD,
                             new Identifier("backrooms:level_"+state.get(LEVEL))));
 
 

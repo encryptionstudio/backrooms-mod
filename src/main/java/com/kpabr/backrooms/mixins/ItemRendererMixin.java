@@ -21,6 +21,7 @@ import com.kpabr.backrooms.access.ItemRendererAccess;
 import com.kpabr.backrooms.client.render.sky.RemoveSkyboxQuadsBakedModel;
 import com.kpabr.backrooms.client.render.sky.SkyboxShaders;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gui.screen.world.WorldCreator.Mode;
 import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.BufferRenderer;
 import net.minecraft.client.render.Camera;
@@ -37,8 +38,9 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Matrix4f;
-import net.minecraft.util.math.Vec3f;
+import org.joml.Matrix4f;
+import org.joml.Quaternionf;
+import org.joml.Vector3f;
 import net.minecraft.world.World;
 
 @Mixin(ItemRenderer.class)
@@ -63,7 +65,7 @@ public abstract class ItemRendererMixin implements ItemRendererAccess {
 	}
 
 	@Inject(method = "Lnet/minecraft/client/render/item/ItemRenderer;renderItem(Lnet/minecraft/item/ItemStack;Lnet/minecraft/client/render/model/json/ModelTransformation$Mode;ZLnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider;IILnet/minecraft/client/render/model/BakedModel;)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/item/ItemRenderer;renderBakedItemModel(Lnet/minecraft/client/render/model/BakedModel;Lnet/minecraft/item/ItemStack;IILnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumer;)V", shift = Shift.AFTER))
-	public void corners$renderItem(ItemStack stack, ModelTransformation.Mode renderMode, boolean leftHanded, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, int overlay, BakedModel model, CallbackInfo ci) {
+	public void corners$renderItem(ItemStack stack, Mode renderMode, boolean leftHanded, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, int overlay, BakedModel model, CallbackInfo ci) throws CloneNotSupportedException {
 		BakedModel bakedModel = ((ItemRendererAccess) (ItemRenderer) (Object) this).getItemModelPure(stack, null, null, 0);
 		List<BakedQuad> quads = Lists.newArrayList();
 		SkyboxShaders.addAll(quads, bakedModel, null);
@@ -85,28 +87,31 @@ public abstract class ItemRendererMixin implements ItemRendererAccess {
 		MatrixStack modelViewStack = RenderSystem.getModelViewStack();
 		modelViewStack.push();
 
-		Matrix4f matrix = matrices.peek().getPositionMatrix().copy();
+		Matrix4f matrix = (Matrix4f) matrices.peek().getPositionMatrix().clone();
 
-		matrix.loadIdentity();
-		matrix.multiply(Vec3f.NEGATIVE_Y.getDegreesQuaternion(180));
-		matrix.multiply(Vec3f.NEGATIVE_Y.getDegreesQuaternion(camera.getYaw()));
-		matrix.multiply(Vec3f.NEGATIVE_X.getDegreesQuaternion(camera.getPitch()));
-		matrix.multiply(matrices.peek().getPositionMatrix().copy());
+		matrix.identity();
+		matrix.rotateY((float) Math.toRadians(180));
+		matrix.rotateY((float) Math.toRadians(camera.getYaw()));
+		matrix.rotateX((float) Math.toRadians(camera.getPitch()));
+		matrix.mul((Matrix4f) matrices.peek().getPositionMatrix().clone());
 
-		modelViewStack.multiply(Vec3f.POSITIVE_X.getDegreesQuaternion(camera.getPitch()));
-		modelViewStack.multiply(Vec3f.POSITIVE_Y.getDegreesQuaternion(camera.getYaw()));
-		modelViewStack.multiply(Vec3f.POSITIVE_Y.getDegreesQuaternion(180));
-
+		Quaternionf rotation = new Quaternionf();
+		rotation.rotateX((float) Math.toRadians(-camera.getPitch()));
+		rotation.rotateY((float) Math.toRadians(-camera.getYaw()));
+		rotation.rotateY((float) Math.toRadians(-180));
+		modelViewStack.multiply(rotation);
+		
 		RenderSystem.applyModelViewMatrix();
 		while (quadIterator.hasNext()) {
 			BakedQuad quad = quadIterator.next();
 			RenderSystem.setShader(() -> SkyboxShaders.SKYBOX_SHADER);
 			for (int i = 0; i < 6; i++) {
-				RenderSystem.setShaderTexture(i, new Identifier(quad.getSprite().getId().getNamespace(), "textures/" + quad.getSprite().getId().getPath() + "_" + i + ".png"));
+				RenderSystem.setShaderTexture(i, new Identifier(quad.getSprite().getAtlasId().getNamespace(), "textures/" + quad.getSprite().getAtlasId().getPath() + "_" + i + ".png"));
 			}
-			SkyboxShaders.quad((vec3f) -> bufferBuilder.vertex(vec3f.getX(), vec3f.getY(), vec3f.getZ()).next(), matrix, quad);
+			SkyboxShaders.quad((vector3f) -> bufferBuilder.vertex(vector3f.x, vector3f.y, vector3f.z).next(), matrix, quad);
 		}
-		BufferRenderer.drawWithShader(bufferBuilder.end());
+		
+		BufferRenderer.draw(bufferBuilder.end());
 		RenderSystem.polygonOffset(0.0F, 0.0F);
 		RenderSystem.disablePolygonOffset();
 		modelViewStack.pop();

@@ -21,6 +21,7 @@ import com.kpabr.backrooms.world.chunk.LevelZeroChunkGenerator;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.serialization.Codec;
+import com.mojang.serialization.Lifecycle;
 
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.dimension.v1.FabricDimensions;
@@ -36,8 +37,11 @@ import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.registry.Registry;
-import net.minecraft.util.registry.RegistryKey;
+import net.minecraft.registry.Registries;
+import net.minecraft.registry.Registry;
+import net.minecraft.registry.RegistryKey;
+import net.minecraft.registry.RegistryKeys;
+import net.minecraft.registry.SimpleRegistry;
 import net.minecraft.world.TeleportTarget;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
@@ -49,6 +53,12 @@ import static com.kpabr.backrooms.util.RegistryHelper.get;
 import static net.minecraft.server.command.CommandManager.literal;
 
 public class BackroomsLevels {
+
+    // Levels Biomes
+    // The biome options refer to the JSON-file in the worldgen/biome subfolder of the datapack,
+	// which will always share it's ID with the biome that is created from it
+
+    public static final SimpleRegistry<Biome> BIOME_REGISTRY = new SimpleRegistry<>(RegistryKeys.BIOME, Lifecycle.stable());
 
     // Level 0 biomes
     public static final RegistryKey<Biome> DECREPIT_BIOME = get("decrepit", DecrepitBiome.create());
@@ -72,38 +82,38 @@ public class BackroomsLevels {
     // The dimension options refer to the JSON-file in the dimension subfolder of the datapack,
 	// which will always share it's ID with the world that is created from it
 	public static final RegistryKey<DimensionOptions> LEVEL_0_DIMENSION_KEY = RegistryKey.of(
-        Registry.DIMENSION_KEY,
+        RegistryKeys.DIMENSION,
         new Identifier(BackroomsMod.ModId, "level_0")
     );
     public static RegistryKey<World> LEVEL_0_WORLD_KEY = RegistryKey.of(
-        Registry.WORLD_KEY,
+        RegistryKeys.WORLD,
         LEVEL_0_DIMENSION_KEY.getValue()
     );
 
     public static final RegistryKey<DimensionOptions> LEVEL_1_DIMENSION_KEY = RegistryKey.of(
-        Registry.DIMENSION_KEY,
+        RegistryKeys.DIMENSION,
         new Identifier(BackroomsMod.ModId, "level_1")
     );
     public static RegistryKey<World> LEVEL_1_WORLD_KEY = RegistryKey.of(
-        Registry.WORLD_KEY,
+        RegistryKeys.WORLD,
         LEVEL_1_DIMENSION_KEY.getValue()
     );
 
     public static final RegistryKey<DimensionOptions> LEVEL_2_DIMENSION_KEY = RegistryKey.of(
-        Registry.DIMENSION_KEY,
+        RegistryKeys.DIMENSION,
         new Identifier(BackroomsMod.ModId, "level_2")
     );
     public static RegistryKey<World> LEVEL_2_WORLD_KEY = RegistryKey.of(
-        Registry.WORLD_KEY,
+        RegistryKeys.WORLD,
         LEVEL_2_DIMENSION_KEY.getValue()
     );
 
     public static final RegistryKey<DimensionOptions> LEVEL_3_DIMENSION_KEY = RegistryKey.of(
-        Registry.DIMENSION_KEY,
+        RegistryKeys.DIMENSION,
         new Identifier(BackroomsMod.ModId, "level_3")
     );
     public static RegistryKey<World> LEVEL_3_WORLD_KEY = RegistryKey.of(
-        Registry.WORLD_KEY,
+        RegistryKeys.WORLD,
         LEVEL_3_DIMENSION_KEY.getValue()
     );
 
@@ -152,27 +162,24 @@ public class BackroomsLevels {
     }
 
     public static RegistryKey<World> addLevel(String namespace, String levelName, String biomeSourceName, Codec<? extends ChunkGenerator> chunkGenerator, Codec<? extends BiomeSource> biomeSource) {
-        Registry.register(Registry.BIOME_SOURCE, new Identifier(namespace, biomeSourceName), biomeSource);
-		Registry.register(Registry.CHUNK_GENERATOR, new Identifier(namespace, levelName), chunkGenerator);
-        return RegistryKey.of(Registry.WORLD_KEY, new Identifier(namespace, levelName));
+        Registry.register(Registries.BIOME_SOURCE, new Identifier(namespace, biomeSourceName), biomeSource);
+		Registry.register(Registries.CHUNK_GENERATOR, new Identifier(namespace, levelName), chunkGenerator);
+        return RegistryKey.of(RegistryKeys.WORLD, new Identifier(namespace, levelName));
     }
 
     // only for debug
     private static int debugTeleport(CommandContext<ServerCommandSource> context, RegistryKey<World> level) throws CommandSyntaxException {
         ServerPlayerEntity player = context.getSource().getPlayer();
-		ServerWorld serverWorld = player.getWorld();
+		ServerWorld serverWorld = player.getServerWorld();
 		ServerWorld targetWorld = context.getSource().getServer().getWorld(level);
 
 		if (serverWorld != targetWorld) {
 			TeleportTarget target = new TeleportTarget(new Vec3d(0.5, 101, 0.5), Vec3d.ZERO, 0, 0);
 			FabricDimensions.teleport(player, targetWorld, target);
 
-			if (player.world != targetWorld) {
+			if (player.getWorld() != targetWorld) {
 				throw new CommandException(Text.literal("Teleportation failed!"));
 			}
-
-			targetWorld.setBlockState(new BlockPos(0, 100, 0), Blocks.DIAMOND_BLOCK.getDefaultState());
-			targetWorld.setBlockState(new BlockPos(0, 101, 0), Blocks.TORCH.getDefaultState());
 		} else {
 			TeleportTarget target = new TeleportTarget(new Vec3d(0, 100, 0), Vec3d.ZERO,
 					(float) Math.random() * 360 - 180, (float) Math.random() * 360 - 180);

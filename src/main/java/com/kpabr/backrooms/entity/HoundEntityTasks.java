@@ -52,7 +52,7 @@ public final class HoundEntityTasks {
         }
 
         private boolean isPlayerFound() {
-            final var player = this.owner.world.getClosestPlayer(
+            final var player = this.owner.getWorld().getClosestPlayer(
                     TargetPredicate.createAttackable().setBaseMaxDistance(20.0F).setPredicate(null),
                     this.owner, this.owner.getX(), this.owner.getEyeY(), this.owner.getZ());
 

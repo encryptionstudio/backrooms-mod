@@ -3,9 +3,9 @@ package com.kpabr.backrooms.client.entity.model;
 import com.kpabr.backrooms.BackroomsMod;
 import com.kpabr.backrooms.entity.HoundEntity;
 import net.minecraft.util.Identifier;
-import software.bernie.geckolib3.model.AnimatedGeoModel;
+import software.bernie.geckolib.model.GeoModel;
 
-public class HoundModel extends AnimatedGeoModel<HoundEntity> {
+public class HoundModel extends GeoModel<HoundEntity> {
 
     @Override
     public Identifier getModelResource(HoundEntity object) {

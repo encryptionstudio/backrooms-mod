@@ -3,13 +3,17 @@ package com.kpabr.backrooms.util;
 import java.io.IOException;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 
 import org.apache.logging.log4j.util.TriConsumer;
 
+import com.kpabr.backrooms.BackroomsMod;
+import com.mojang.authlib.properties.Property;
 import com.mojang.datafixers.util.Pair;
 
+import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.nbt.NbtCompound;
@@ -19,8 +23,14 @@ import net.minecraft.nbt.NbtHelper;
 import net.minecraft.nbt.NbtInt;
 import net.minecraft.nbt.NbtIo;
 import net.minecraft.nbt.NbtList;
+import net.minecraft.registry.RegistryEntryLookup;
+import net.minecraft.registry.RegistryKey;
+import net.minecraft.registry.RegistryKeys;
+import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.resource.Resource;
 import net.minecraft.resource.ResourceManager;
+import net.minecraft.state.State;
+import net.minecraft.state.StateManager;
 import net.minecraft.util.BlockRotation;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
@@ -57,7 +67,7 @@ public class NbtPlacerUtil {
 		HashMap<Integer, BlockState> palette = new HashMap<Integer, BlockState>(paletteList.size());
 		List<NbtCompound> paletteCompoundList = paletteList.stream().filter(nbtElement -> nbtElement instanceof NbtCompound).map(element -> (NbtCompound) element).toList();
 		for (int i = 0; i < paletteCompoundList.size(); i++) {
-			palette.put(i, NbtHelper.toBlockState(paletteCompoundList.get(i)).rotate(rotation));
+			palette.put(i, toBlockState(null, paletteCompoundList.get(i)).rotate(rotation));
 		}
 
 		NbtList sizeList = storedNbt.getList("size", 3);
@@ -72,6 +82,49 @@ public class NbtPlacerUtil {
 		return new NbtPlacerUtil(storedNbt, positions, storedNbt.getList("entities", 10), positionsPairList.get(0).getFirst(), sizeVector);
 	}
 
+	// Blindly copied from Minecraft Source and modified to prevent null pointer exception
+	public static BlockState toBlockState(RegistryEntryLookup<Block> blockLookup, NbtCompound nbt) {
+      if (!nbt.contains("Name", 8)) {
+         return Blocks.AIR.getDefaultState();
+      } else {
+         Identifier identifier = new Identifier(nbt.getString("Name"));
+         Optional<? extends RegistryEntry<Block>> optional = Optional.empty();
+         if (optional.isEmpty()) {
+            return Blocks.AIR.getDefaultState();
+         } else {
+            Block block = (Block)((RegistryEntry)optional.get()).value();
+            BlockState blockState = block.getDefaultState();
+            if (nbt.contains("Properties", 10)) {
+               NbtCompound nbtCompound = nbt.getCompound("Properties");
+               StateManager<Block, BlockState> stateManager = block.getStateManager();
+               Iterator var8 = nbtCompound.getKeys().iterator();
+
+               while(var8.hasNext()) {
+                  String string = (String)var8.next();
+                  net.minecraft.state.property.Property<?> property = stateManager.getProperty(string);
+                  if (property != null) {
+                     blockState = (BlockState)withProperty(blockState, property, string, nbtCompound, nbt);
+                  }
+               }
+            }
+
+            return blockState;
+         }
+      }
+   }
+
+   private static BlockState withProperty(BlockState state, net.minecraft.state.property.Property property, String key, NbtCompound properties, NbtCompound root) {
+	Optional<Property> optional = property.parse(properties.getString(key));
+	if (optional.isPresent()) {
+	   return (BlockState) state.with(property, (Comparable) optional.get());
+	} else {
+	   BackroomsMod.LOGGER.warn("Unable to read property: {} with value: {} for blockstate: {}", new Object[]{key, properties.getString(key), root.toString()});
+	   return state;
+	}
+ }
+
+ // end of copied stuff
+
 	public static Optional<NbtPlacerUtil> load(ResourceManager manager, Identifier id) {
 		try {
 			Optional<NbtCompound> nbtOptional = loadNbtFromFile(manager, id);
@@ -82,7 +135,7 @@ public class NbtPlacerUtil {
 				HashMap<Integer, BlockState> palette = new HashMap<Integer, BlockState>(paletteList.size());
 				List<NbtCompound> paletteCompoundList = paletteList.stream().filter(nbtElement -> nbtElement instanceof NbtCompound).map(element -> (NbtCompound) element).toList();
 				for (int i = 0; i < paletteCompoundList.size(); i++) {
-					palette.put(i, NbtHelper.toBlockState(paletteCompoundList.get(i)));
+					palette.put(i, toBlockState(null, paletteCompoundList.get(i)));
 				}
 
 				NbtList sizeList = nbt.getList("size", 3);

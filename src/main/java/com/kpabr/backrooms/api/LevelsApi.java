@@ -3,7 +3,7 @@ package com.kpabr.backrooms.api;
 import com.kpabr.backrooms.init.BackroomsLevels;
 import com.mojang.serialization.Codec;
 
-import net.minecraft.util.registry.RegistryKey;
+import net.minecraft.registry.RegistryKey;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.source.BiomeSource;
 import net.minecraft.world.gen.chunk.ChunkGenerator;

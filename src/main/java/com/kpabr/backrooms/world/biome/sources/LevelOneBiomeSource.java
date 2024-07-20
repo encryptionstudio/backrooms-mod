@@ -1,16 +1,24 @@
 package com.kpabr.backrooms.world.biome.sources;
 
+import java.util.stream.Stream;
+
+import com.kpabr.backrooms.BackroomsMod;
 import com.kpabr.backrooms.init.BackroomsLevels;
 import com.kpabr.backrooms.util.BiomeListBuilder;
 import com.kpabr.backrooms.util.BiomeRegistryList;
 import com.kpabr.backrooms.util.LevelParameters;
 import com.mojang.serialization.Codec;
+import com.mojang.serialization.Lifecycle;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 
-import net.minecraft.util.dynamic.RegistryOps;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.math.noise.SimplexNoiseSampler;
-import net.minecraft.util.registry.Registry;
-import net.minecraft.util.registry.RegistryEntry;
+import net.minecraft.registry.Registries;
+import net.minecraft.registry.Registry;
+import net.minecraft.registry.RegistryCodecs;
+import net.minecraft.registry.RegistryKeys;
+import net.minecraft.registry.SimpleRegistry;
+import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.source.BiomeSource;
 import net.minecraft.world.biome.source.util.MultiNoiseUtil.MultiNoiseSampler;
@@ -20,12 +28,7 @@ import net.minecraft.util.math.random.Random;
 
 public class LevelOneBiomeSource extends BiomeSource{
 
-    public static final Codec<LevelOneBiomeSource> CODEC = RecordCodecBuilder.create((instance) ->
-            instance.group(
-                    RegistryOps.createRegistryCodec(Registry.BIOME_KEY)
-                            .forGetter((biomeSource) -> biomeSource.BIOME_REGISTRY)
-            ).apply(instance, instance.stable(LevelOneBiomeSource::new)));
-
+    public static final Codec<LevelOneBiomeSource> CODEC = Codec.unit(new LevelOneBiomeSource());
 
     private final BiomeRegistryList biomeList;
     
@@ -38,18 +41,13 @@ public class LevelOneBiomeSource extends BiomeSource{
     
     private Registry<Biome> BIOME_REGISTRY;
 
-    public LevelOneBiomeSource(Registry<Biome> biomeRegistry) {
-        this(biomeRegistry, BiomeRegistryList.from(biomeRegistry, new BiomeListBuilder()
+    public LevelOneBiomeSource() {
+        super();
+        BIOME_REGISTRY = BackroomsLevels.BIOME_REGISTRY;
+        this.biomeList = BiomeRegistryList.from(new BiomeListBuilder()
         .addBiome(BackroomsLevels.WAREHOUSE_BIOME, new LevelParameters(0.45, 0.3, 0.8, 0.4, 0.05, 1))
         .addBiome(BackroomsLevels.PARKING_GARAGE_BIOME, new LevelParameters(0.4, 0.4, 0.65, 0.35, 0.05, 0.9))
-        .addBiome(BackroomsLevels.CEMENT_WALLS_BIOME, new LevelParameters(0.35, 0.45, 0.75, 0.4, 0.05, 0.8))));
-
-        this.BIOME_REGISTRY = biomeRegistry;
-    }
-
-    private LevelOneBiomeSource(Registry<Biome> biomeRegistry, BiomeRegistryList biomeList) {
-        super(biomeList.getBiomeEntries());
-        this.biomeList = biomeList;
+        .addBiome(BackroomsLevels.CEMENT_WALLS_BIOME, new LevelParameters(0.35, 0.45, 0.75, 0.4, 0.05, 0.8)));  
     }
 
     @Override
@@ -99,5 +97,11 @@ public class LevelOneBiomeSource extends BiomeSource{
     @Override
     protected Codec<? extends BiomeSource> getCodec() {
         return CODEC;
+    }
+
+    @Override
+    protected Stream<RegistryEntry<Biome>> biomeStream() {
+        return BIOME_REGISTRY.stream()
+            .map(BIOME_REGISTRY::getEntry);
     }
 }

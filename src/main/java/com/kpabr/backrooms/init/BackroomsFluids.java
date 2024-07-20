@@ -6,7 +6,8 @@ import com.kpabr.backrooms.BackroomsMod;
 import com.kpabr.backrooms.fluid.AlmondWaterFluid;
 import net.minecraft.fluid.FlowableFluid;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.registry.Registry;
+import net.minecraft.registry.Registries;
+import net.minecraft.registry.Registry;
 
 public class BackroomsFluids {
     private static final ArrayList<FluidEntry> FLUIDS = new ArrayList<>();
@@ -21,7 +22,7 @@ public class BackroomsFluids {
 
     public static void init() {
         for (FluidEntry entry : FLUIDS) {
-            Registry.register(Registry.FLUID, entry.identifier, entry.fluid);
+            Registry.register(Registries.FLUID, entry.identifier, entry.fluid);
         }
     }
 

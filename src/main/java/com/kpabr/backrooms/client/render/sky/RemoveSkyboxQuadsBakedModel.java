@@ -25,7 +25,7 @@ public class RemoveSkyboxQuadsBakedModel implements BakedModel {
 		if (quads == null) {
 			return null;
 		}
-		return quads.stream().filter((quad) -> !quad.getSprite().getId().getPath().startsWith("sky/")).toList();
+		return quads.stream().filter((quad) -> !quad.getSprite().getAtlasId().getPath().startsWith("sky/")).toList();
 	}
 
 	@Override

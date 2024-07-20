@@ -1,11 +1,13 @@
 package com.kpabr.backrooms.util;
 
-import net.minecraft.util.registry.Registry;
-import net.minecraft.util.registry.RegistryEntry;
+import net.minecraft.registry.Registry;
+import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.world.biome.Biome;
 
 import java.util.HashMap;
 import java.util.stream.Stream;
+
+import com.kpabr.backrooms.init.BackroomsLevels;
 
 public class BiomeRegistryList {
     public static final Double DEFAULT_CHANCE_VALUE = 2.D; // Use for default biome type
@@ -43,11 +45,11 @@ public class BiomeRegistryList {
         return (double) Math.sqrt(sum);
     }
 
-    public static BiomeRegistryList from(Registry<Biome> biomeRegistry, BiomeListBuilder biomeList) {
+    public static BiomeRegistryList from(BiomeListBuilder biomeList) {
         final BiomeRegistryList list = new BiomeRegistryList();
 
         biomeList.getBiomeList().forEach((key, value) ->
-            list.biomeList.put(key, biomeRegistry.getOrCreateEntry(value))
+            list.biomeList.put(key, BackroomsLevels.BIOME_REGISTRY.getEntry(value).get())
         );
         return list;
     }

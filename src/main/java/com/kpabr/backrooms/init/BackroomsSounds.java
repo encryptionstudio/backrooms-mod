@@ -15,6 +15,7 @@ public class BackroomsSounds {
     public static void init() {
         HUMBUZZ_LEVEL_0 = get("humbuzz");
         FIRESALT_LAND_EVENT = get("firesalt_land");
+        //TODO: make loop sound for level two, add in json;
         initHoundSounds();
     }
 

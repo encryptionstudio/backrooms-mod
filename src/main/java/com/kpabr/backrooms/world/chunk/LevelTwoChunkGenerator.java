@@ -10,6 +10,7 @@ import com.kpabr.backrooms.util.ChunkType;
 import com.kpabr.backrooms.util.NbtPlacerUtil;
 import com.kpabr.backrooms.world.biome.sources.LevelTwoBiomeSource;
 import com.mojang.serialization.Codec;
+import com.mojang.serialization.Lifecycle;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.block.*;
 import net.minecraft.nbt.NbtCompound;
@@ -17,12 +18,13 @@ import net.minecraft.server.world.ServerWorld;
 import net.minecraft.structure.StructureSet;
 import net.minecraft.util.BlockRotation;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.dynamic.RegistryOps;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.noise.SimplexNoiseSampler;
-import net.minecraft.util.registry.Registry;
+import net.minecraft.registry.Registry;
+import net.minecraft.registry.RegistryCodecs;
+import net.minecraft.registry.RegistryKeys;
 import net.minecraft.world.ChunkRegion;
 import net.minecraft.world.HeightLimitView;
 import net.minecraft.world.Heightmap;
@@ -47,17 +49,8 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 
 public class LevelTwoChunkGenerator extends ChunkGenerator {
-    
-    
-    public static final Codec<LevelTwoChunkGenerator> CODEC = RecordCodecBuilder.create((instance) ->
-			createStructureSetRegistryGetter(instance).and(
-				RegistryOps.createRegistryCodec(Registry.BIOME_KEY).forGetter((generator) -> generator.biomeRegistry)
-			)
-			.apply(instance, instance.stable(LevelTwoChunkGenerator::new))
-	);
 
-    
-    private final Registry<Biome> biomeRegistry;
+    public static final Codec<LevelTwoChunkGenerator> CODEC = Codec.unit(new LevelTwoChunkGenerator());
     private final HashMap<String, NbtPlacerUtil> loadedStructures = new HashMap<String, NbtPlacerUtil>(30);
     private Identifier nbtId = BackroomsMod.id("level_2");
 
@@ -87,9 +80,8 @@ public class LevelTwoChunkGenerator extends ChunkGenerator {
             .with(PipeBlock.NORTH, false)
             .with(PipeBlock.SOUTH, false);
 
-    public LevelTwoChunkGenerator(Registry<StructureSet> registry, Registry<Biome> biomeRegistry) {
-        super(registry, Optional.empty(), new LevelTwoBiomeSource(biomeRegistry));
-        this.biomeRegistry = biomeRegistry;
+    public LevelTwoChunkGenerator() {
+        super(new LevelTwoBiomeSource());
     }
 
     @Override

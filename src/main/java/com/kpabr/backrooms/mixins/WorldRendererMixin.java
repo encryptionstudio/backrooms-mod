@@ -45,8 +45,11 @@ import net.minecraft.client.world.ClientWorld;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Matrix4f;
-import net.minecraft.util.math.Vec3f;
+
+import org.joml.Matrix4f;
+import org.joml.Quaternionf;
+import org.joml.Vector3f;
+import org.joml.Vector4f;
 
 @Environment(EnvType.CLIENT)
 @Mixin(value = WorldRenderer.class, priority = 1001)
@@ -90,9 +93,9 @@ public class WorldRendererMixin {
 
 		MatrixStack modelViewStack = RenderSystem.getModelViewStack();
 		modelViewStack.push();
-		modelViewStack.multiply(Vec3f.POSITIVE_X.getDegreesQuaternion(camera.getPitch()));
-		modelViewStack.multiply(Vec3f.POSITIVE_Y.getDegreesQuaternion(camera.getYaw()));
-		modelViewStack.multiply(Vec3f.POSITIVE_Y.getDegreesQuaternion(180));
+		modelViewStack.multiply(new Quaternionf().rotateX((float) Math.toRadians(camera.getPitch())));
+		modelViewStack.multiply(new Quaternionf().rotateY((float) Math.toRadians(camera.getYaw())));
+		modelViewStack.multiply(new Quaternionf().rotateY((float) Math.toRadians(180)));
 		RenderSystem.applyModelViewMatrix();
 
 		this.getSkyboxPairs().forEach((pair) -> {
@@ -117,22 +120,30 @@ public class WorldRendererMixin {
 				BakedQuad quad = quadIterator.next();
 				RenderSystem.setShader(() -> SkyboxShaders.SKYBOX_SHADER);
 				for (int i = 0; i < 6; i++) {
-					RenderSystem.setShaderTexture(i, new Identifier(quad.getSprite().getId().getNamespace(), "textures/" + quad.getSprite().getId().getPath() + "_" + i + ".png"));
+					RenderSystem.setShaderTexture(i, new Identifier(quad.getSprite().getAtlasId().getNamespace(), "textures/" + quad.getSprite().getAtlasId().getPath() + "_" + i + ".png"));
 				}
 
-				Matrix4f matrix = matrices.peek().getPositionMatrix().copy();
-				matrix.loadIdentity();
-				matrix.multiply(Vec3f.NEGATIVE_Y.getDegreesQuaternion(180));
-				matrix.multiply(Vec3f.NEGATIVE_Y.getDegreesQuaternion(camera.getYaw()));
-				matrix.multiply(Vec3f.NEGATIVE_X.getDegreesQuaternion(camera.getPitch()));
-				matrix.multiply(matrices.peek().getPositionMatrix().copy());
+				Matrix4f matrix = (Matrix4f) matrices.peek().getPositionMatrix();
+				matrix.identity();
 
-				SkyboxShaders.quad((vec3f) -> bufferBuilder.vertex(vec3f.getX(), vec3f.getY(), vec3f.getZ()).next(), matrix, quad);
+				Matrix4f rotationMatrix = new Matrix4f();
+				new Quaternionf().rotateY((float) Math.toRadians(180)).get(rotationMatrix);
+				matrix.mul(rotationMatrix);
+
+				new Quaternionf().rotateY((float) Math.toRadians(camera.getYaw())).get(rotationMatrix);
+				matrix.mul(rotationMatrix);
+
+				new Quaternionf().rotateX((float) Math.toRadians(camera.getPitch())).get(rotationMatrix);
+				matrix.mul(rotationMatrix);
+
+				matrix.mul((Matrix4f) matrices.peek().getPositionMatrix());	
+
+				SkyboxShaders.quad((vec3f) -> bufferBuilder.vertex(vec3f.x, vec3f.y, vec3f.z).next(), matrix, quad);
 			}
 			matrices.pop();
 		});
 
-		BufferRenderer.drawWithShader(bufferBuilder.end());
+		BufferRenderer.draw(bufferBuilder.end());
 		RenderSystem.polygonOffset(0.0F, 0.0F);
 		RenderSystem.disablePolygonOffset();
 		modelViewStack.pop();

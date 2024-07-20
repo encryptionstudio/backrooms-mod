@@ -11,7 +11,7 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.function.BooleanBiFunction;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
-import net.minecraft.util.registry.RegistryKey;
+import net.minecraft.registry.RegistryKey;
 import net.minecraft.util.shape.VoxelShapes;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
@@ -30,7 +30,7 @@ public abstract class EntityMixin {
 
     @Inject(method="tick", at=@At(value = "HEAD"))
     private void backroomsTick(CallbackInfo ci) {
-        World world = ((Entity) (Object) this).world;
+        World world = ((Entity) (Object) this).getWorld();
         Entity entity = ((Entity) (Object) this);
         
         if (entity instanceof ServerPlayerEntity) {
@@ -59,11 +59,11 @@ public abstract class EntityMixin {
         Box box = Box.of(entity.getEyePos(), f, 1.0E-6, f);
 
         return BlockPos.stream(box).anyMatch(pos -> {
-            BlockState blockState = entity.world.getBlockState(pos);
+            BlockState blockState = entity.getWorld().getBlockState(pos);
             return !blockState.isAir()
                     // default checks copied from isInsideWall() method
-                    && blockState.shouldSuffocate(entity.world, pos)
-                    && VoxelShapes.matchesAnywhere(blockState.getCollisionShape(entity.world, pos).offset(pos.getX(), pos.getY(), pos.getZ()), VoxelShapes.cuboid(box), BooleanBiFunction.AND)
+                    && blockState.shouldSuffocate(entity.getWorld(), pos)
+                    && VoxelShapes.matchesAnywhere(blockState.getCollisionShape(entity.getWorld(), pos).offset(pos.getX(), pos.getY(), pos.getZ()), VoxelShapes.cuboid(box), BooleanBiFunction.AND)
                     // if block isn't falling(so it's not gravel or sand)
                     && !(blockState.getBlock() instanceof FallingBlock);
         });

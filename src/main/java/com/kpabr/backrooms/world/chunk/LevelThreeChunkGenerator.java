@@ -10,6 +10,7 @@ import java.util.concurrent.Executor;
 
 import com.kpabr.backrooms.init.BackroomsLevels;
 import com.mojang.serialization.Codec;
+import com.mojang.serialization.Lifecycle;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 
 import net.minecraft.block.BlockState;
@@ -17,12 +18,13 @@ import net.minecraft.block.Blocks;
 import com.kpabr.backrooms.init.BackroomsBlocks;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.structure.StructureSet;
-import net.minecraft.util.dynamic.RegistryOps;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.registry.Registry;
+import net.minecraft.registry.Registry;
+import net.minecraft.registry.RegistryCodecs;
+import net.minecraft.registry.RegistryKeys;
 import net.minecraft.world.ChunkRegion;
 import net.minecraft.world.HeightLimitView;
 import net.minecraft.world.Heightmap;
@@ -39,20 +41,13 @@ import net.minecraft.world.gen.chunk.VerticalBlockSample;
 import net.minecraft.world.gen.noise.NoiseConfig;
 
 public class LevelThreeChunkGenerator extends ChunkGenerator {
-    public static final Codec<LevelThreeChunkGenerator> CODEC = RecordCodecBuilder.create((instance) ->
-			createStructureSetRegistryGetter(instance).and(
-				RegistryOps.createRegistryCodec(Registry.BIOME_KEY).forGetter((generator) -> generator.biomeRegistry)
-			)
-			.apply(instance, instance.stable(LevelThreeChunkGenerator::new))
-	);
 
-    private final Registry<Biome> biomeRegistry;
+    public static final Codec<LevelThreeChunkGenerator> CODEC = Codec.unit(new LevelThreeChunkGenerator());
     private static final int ROOF_BEGIN_Y = 6 * (getFloorCount() + 1) + 1;
     private static final BlockState ROOF_BLOCK = BackroomsBlocks.BEDROCK_BRICKS.getDefaultState();
 
-    public LevelThreeChunkGenerator(Registry<StructureSet> registry, Registry<Biome> biomeRegistry) {
-        super(registry, Optional.empty(), new LevelThreeBiomeSource(biomeRegistry));
-        this.biomeRegistry = biomeRegistry;
+    public LevelThreeChunkGenerator() {
+        super(new LevelThreeBiomeSource());
     }
 
     @Override

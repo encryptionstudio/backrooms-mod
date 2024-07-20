@@ -11,7 +11,6 @@ import net.fabricmc.fabric.api.client.particle.v1.ParticleFactoryRegistry;
 import net.fabricmc.fabric.api.client.render.fluid.v1.FluidRenderHandlerRegistry;
 import net.fabricmc.fabric.api.client.render.fluid.v1.SimpleFluidRenderHandler;
 import net.fabricmc.fabric.api.client.rendering.v1.EntityRendererRegistry;
-import net.fabricmc.fabric.api.event.client.ClientSpriteRegistryCallback;
 import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.option.StickyKeyBinding;
 import net.minecraft.client.render.RenderLayer;
@@ -24,9 +23,6 @@ import org.lwjgl.glfw.GLFW;
 public class BackroomsClient implements ClientModInitializer {
 	@Override
 	public void onInitializeClient() {
-		ClientSpriteRegistryCallback.event(PlayerScreenHandler.BLOCK_ATLAS_TEXTURE).register(((atlasTexture, registry) ->
-			registry.register(new Identifier("minecraft", "particle/flame"))
-		));
 
 		//almond water fluid rendering
 		FluidRenderHandlerRegistry.INSTANCE.register(BackroomsFluids.STILL_ALMOND_WATER, BackroomsFluids.FLOWING_ALMOND_WATER,

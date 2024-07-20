@@ -26,7 +26,7 @@ public class WarehouseBiome {
                 .generationSettings(generationSettings.build())
                 .effects(biomeEffects.build())
 
-                .precipitation(Biome.Precipitation.NONE)
+                .precipitation(false)
 
                 .temperature(0.8F)
                 .downfall(1.0F);

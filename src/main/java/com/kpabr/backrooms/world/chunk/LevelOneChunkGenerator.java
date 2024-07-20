@@ -12,17 +12,19 @@ import com.kpabr.backrooms.world.chunk.level1chunkgenerators.CementHallsChunkGen
 import com.kpabr.backrooms.world.chunk.level1chunkgenerators.ParkingGarageChunkGenerator;
 import com.kpabr.backrooms.world.chunk.level1chunkgenerators.WarehouseChunkGenerator;
 import com.mojang.serialization.Codec;
+import com.mojang.serialization.Lifecycle;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.structure.StructureSet;
-import net.minecraft.util.dynamic.RegistryOps;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
-import net.minecraft.util.registry.Registry;
-import net.minecraft.util.registry.RegistryKey;
+import net.minecraft.registry.Registry;
+import net.minecraft.registry.RegistryCodecs;
+import net.minecraft.registry.RegistryKey;
+import net.minecraft.registry.RegistryKeys;
 import net.minecraft.world.ChunkRegion;
 import net.minecraft.world.HeightLimitView;
 import net.minecraft.world.Heightmap;
@@ -40,15 +42,8 @@ import net.minecraft.world.gen.chunk.VerticalBlockSample;
 import net.minecraft.world.gen.noise.NoiseConfig;
 
 public class LevelOneChunkGenerator extends ChunkGenerator {
-	public static final Codec<LevelOneChunkGenerator> CODEC = RecordCodecBuilder.create((instance) ->
-    ChunkGenerator.
-			createStructureSetRegistryGetter(instance).and(
-				RegistryOps.createRegistryCodec(Registry.BIOME_KEY).forGetter((generator) -> generator.biomeRegistry)
-			)
-			.apply(instance, instance.stable(LevelOneChunkGenerator::new))
-	);
 
-	
+	public static final Codec<LevelOneChunkGenerator> CODEC = Codec.unit(new LevelOneChunkGenerator());
     private CementHallsChunkGenerator cementHallsChunkGenerator;
     private ParkingGarageChunkGenerator parkingGarageChunkGenerator;
     private WarehouseChunkGenerator warehouseChunkGenerator;
@@ -63,9 +58,9 @@ public class LevelOneChunkGenerator extends ChunkGenerator {
     
 	private final Registry<Biome> biomeRegistry;
 
-	public LevelOneChunkGenerator(Registry<StructureSet> registry, Registry<Biome> biomeRegistry) {
-		super(registry, Optional.empty(), new LevelOneBiomeSource(biomeRegistry));
-		this.biomeRegistry = biomeRegistry;
+	public LevelOneChunkGenerator() {
+		super(new LevelOneBiomeSource());
+		this.biomeRegistry = null;
 	}
 
 	@Override
