@@ -59,7 +59,6 @@ public class FireSaltProjectileEntity extends ThrownItemEntity {
         }
     }
 
-    // ? DOES THIS WORK?
     protected void onEntityHit(EntityHitResult entityHitResult) {
         super.onEntityHit(entityHitResult);
         Entity entity = entityHitResult.getEntity();

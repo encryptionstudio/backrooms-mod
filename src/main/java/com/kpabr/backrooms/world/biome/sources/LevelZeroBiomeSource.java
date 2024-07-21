@@ -3,6 +3,7 @@ package com.kpabr.backrooms.world.biome.sources;
 import java.util.stream.Stream;
 
 import com.kpabr.backrooms.BackroomsMod;
+import com.kpabr.backrooms.init.BackroomsGroups;
 import com.kpabr.backrooms.init.BackroomsLevels;
 import com.kpabr.backrooms.util.BiomeListBuilder;
 import com.kpabr.backrooms.util.BiomeRegistryList;
@@ -15,6 +16,7 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.util.math.noise.SimplexNoiseSampler;
 import net.minecraft.registry.Registry;
 import net.minecraft.registry.RegistryCodecs;
+import net.minecraft.registry.RegistryEntryLookup;
 import net.minecraft.registry.RegistryKeys;
 import net.minecraft.registry.RegistryOps;
 import net.minecraft.registry.entry.RegistryEntry;
@@ -27,8 +29,10 @@ import net.minecraft.util.math.random.Random;
 
 public class LevelZeroBiomeSource extends BiomeSource {
 
+    public static final Codec<LevelZeroBiomeSource> CODEC = RecordCodecBuilder.create((instance) ->
+			instance.group(RegistryOps.getEntryLookupCodec(RegistryKeys.BIOME))
+					.apply(instance, instance.stable(LevelZeroBiomeSource::new)));
 
-    public static final Codec<LevelZeroBiomeSource> CODEC = Codec.unit(new LevelZeroBiomeSource());
     private final BiomeRegistryList biomeList;
     
     private SimplexNoiseSampler temperatureNoiseSampler;
@@ -38,56 +42,55 @@ public class LevelZeroBiomeSource extends BiomeSource {
     private SimplexNoiseSampler toxicityNoiseSampler;
     private boolean isNoiseInitialized = false;
     
-    private Registry<Biome> BIOME_REGISTRY;
+    private RegistryEntryLookup<Biome> BIOME_REGISTRY;
 
-    public LevelZeroBiomeSource() {
-        this(BackroomsLevels.BIOME_REGISTRY, BiomeRegistryList.from(new BiomeListBuilder()
+    public LevelZeroBiomeSource(RegistryEntryLookup<Biome> biomeRegistry) {
+        this(BiomeRegistryList.from(new BiomeListBuilder()
         .addBiome(BackroomsLevels.CRIMSON_WALLS_BIOME, new LevelParameters(0.6, 0.65, 0.75, 0.45, 0.15, 1))
         .addBiome(BackroomsLevels.DECREPIT_BIOME, new LevelParameters(0.55, 0.7, 0.5, 0.3, 0.25, 1.2))
         .addBiome(BackroomsLevels.MEGALOPHOBIA_BIOME, new LevelParameters(0.45, 0.55, 0.65, 0.4, 0.05, 1))
-        .addBiome(BackroomsLevels.YELLOW_WALLS_BIOME, new LevelParameters(0.5, 0.4, 0.75, 0.45, 0.05, 0.9))));
-        this.BIOME_REGISTRY = BackroomsLevels.BIOME_REGISTRY;
+        .addBiome(BackroomsLevels.YELLOW_WALLS_BIOME, new LevelParameters(0.5, 0.4, 0.75, 0.45, 0.05, 0.9)), biomeRegistry));
+        BIOME_REGISTRY = biomeRegistry;
     }
 
-    private LevelZeroBiomeSource(Registry<Biome> biomeRegistry, BiomeRegistryList biomeList) {
+    private LevelZeroBiomeSource(BiomeRegistryList biomeList) {
         super();
         this.biomeList = biomeList;
     }
 
     @Override
     public RegistryEntry<Biome> getBiome(int x, int y, int z, MultiNoiseSampler noise) {
-        BackroomsMod.LOGGER.info(biomeList.getBiomeEntries().findFirst().get().toString());
-        return biomeList.getBiomeEntries().findFirst().get();
-        // if (!this.isNoiseInitialized) {
+        // return biomeList.findNearest(new LevelParameters(0, 0, 0, 0, 0, 0d));
+        if (!this.isNoiseInitialized) {
 
-        //     long seed = BackroomsLevels.LEVEL_0_WORLD.getSeed();
-        //     Random randomGenerator = Random.create(seed);
+            long seed = BackroomsLevels.LEVEL_0_WORLD.getSeed();
+            Random randomGenerator = Random.create(seed);
             
-        //     // Generate five different random seeds based on the world seed
-        //     long[] randomSeeds = new long[5];
-        //     for (int i = 0; i < 5; i++) {
-        //         randomSeeds[i] = randomGenerator.nextLong();
-        //     }
+            // Generate five different random seeds based on the world seed
+            long[] randomSeeds = new long[5];
+            for (int i = 0; i < 5; i++) {
+                randomSeeds[i] = randomGenerator.nextLong();
+            }
 
-        //     this.temperatureNoiseSampler = new SimplexNoiseSampler(new ChunkRandom(Random.create(randomSeeds[0])));
+            this.temperatureNoiseSampler = new SimplexNoiseSampler(new ChunkRandom(Random.create(randomSeeds[0])));
             
-        //     this.moistnessNoiseSampler = new SimplexNoiseSampler(new ChunkRandom(Random.create(randomSeeds[1])));
+            this.moistnessNoiseSampler = new SimplexNoiseSampler(new ChunkRandom(Random.create(randomSeeds[1])));
             
-        //     this.integrityNoiseSampler = new SimplexNoiseSampler(new ChunkRandom(Random.create(randomSeeds[2])));
+            this.integrityNoiseSampler = new SimplexNoiseSampler(new ChunkRandom(Random.create(randomSeeds[2])));
             
-        //     this.purityNoiseSampler = new SimplexNoiseSampler(new ChunkRandom(Random.create(randomSeeds[3])));
+            this.purityNoiseSampler = new SimplexNoiseSampler(new ChunkRandom(Random.create(randomSeeds[3])));
             
-        //     this.toxicityNoiseSampler = new SimplexNoiseSampler(new ChunkRandom(Random.create(randomSeeds[4])));
-        //     this.isNoiseInitialized = true;
-        // }
+            this.toxicityNoiseSampler = new SimplexNoiseSampler(new ChunkRandom(Random.create(randomSeeds[4])));
+            this.isNoiseInitialized = true;
+        }
         
-        // double temperatureNoiseAt = getNoiseAt(this.temperatureNoiseSampler, x, y, z);
-        // double moistnessNoiseAt = getNoiseAt(this.moistnessNoiseSampler, x, y, z);
-        // double integrityNoiseAt = getNoiseAt(this.integrityNoiseSampler, x, y, z);
-        // double purityNoiseAt = getNoiseAt(this.purityNoiseSampler, x, y, z);
-        // double toxicityNoiseAt = getNoiseAt(this.toxicityNoiseSampler, x, y, z);
+        double temperatureNoiseAt = getNoiseAt(this.temperatureNoiseSampler, x, y, z);
+        double moistnessNoiseAt = getNoiseAt(this.moistnessNoiseSampler, x, y, z);
+        double integrityNoiseAt = getNoiseAt(this.integrityNoiseSampler, x, y, z);
+        double purityNoiseAt = getNoiseAt(this.purityNoiseSampler, x, y, z);
+        double toxicityNoiseAt = getNoiseAt(this.toxicityNoiseSampler, x, y, z);
         
-        // return biomeList.findNearest(new LevelParameters(temperatureNoiseAt, moistnessNoiseAt, integrityNoiseAt, purityNoiseAt, toxicityNoiseAt, 0d));
+        return biomeList.findNearest(new LevelParameters(temperatureNoiseAt, moistnessNoiseAt, integrityNoiseAt, purityNoiseAt, toxicityNoiseAt, 0d));
     }
 
     public static double getNoiseAt(SimplexNoiseSampler perlinNoiseSampler, int x, int y, int z) {
@@ -107,7 +110,9 @@ public class LevelZeroBiomeSource extends BiomeSource {
 
     @Override
     protected Stream<RegistryEntry<Biome>> biomeStream() {
-        return BIOME_REGISTRY.stream()
-            .map(BIOME_REGISTRY::getEntry);
+        return Stream.of(this.BIOME_REGISTRY.getOrThrow(BackroomsLevels.YELLOW_WALLS_BIOME),
+        this.BIOME_REGISTRY.getOrThrow(BackroomsLevels.CRIMSON_WALLS_BIOME),
+        this.BIOME_REGISTRY.getOrThrow(BackroomsLevels.DECREPIT_BIOME),
+        this.BIOME_REGISTRY.getOrThrow(BackroomsLevels.MEGALOPHOBIA_BIOME));
     }
 }

@@ -223,7 +223,6 @@ public class BackroomsBlocks {
 		registerFlammableBlocks();
 		registerFuels();
 
-		// ? DOES THIS WORK?
 		for (RegistryKey<ItemGroup> groupKey : GROUPED_ITEMS.keySet()) {
 			ItemGroupEvents.modifyEntriesEvent(groupKey)
 				.register((itemGroup) -> addAllItemsToGroup(itemGroup, groupKey));

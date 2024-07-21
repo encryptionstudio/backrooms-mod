@@ -24,7 +24,9 @@ import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.registry.Registry;
 import net.minecraft.registry.RegistryCodecs;
+import net.minecraft.registry.RegistryEntryLookup;
 import net.minecraft.registry.RegistryKeys;
+import net.minecraft.registry.RegistryOps;
 import net.minecraft.world.ChunkRegion;
 import net.minecraft.world.HeightLimitView;
 import net.minecraft.world.Heightmap;
@@ -42,12 +44,14 @@ import net.minecraft.world.gen.noise.NoiseConfig;
 
 public class LevelThreeChunkGenerator extends ChunkGenerator {
 
-    public static final Codec<LevelThreeChunkGenerator> CODEC = Codec.unit(new LevelThreeChunkGenerator());
+    public static final Codec<LevelThreeChunkGenerator> CODEC = RecordCodecBuilder.create((instance) ->
+			instance.group(RegistryOps.getEntryLookupCodec(RegistryKeys.BIOME))
+					.apply(instance, instance.stable(LevelThreeChunkGenerator::new)));
     private static final int ROOF_BEGIN_Y = 6 * (getFloorCount() + 1) + 1;
     private static final BlockState ROOF_BLOCK = BackroomsBlocks.BEDROCK_BRICKS.getDefaultState();
 
-    public LevelThreeChunkGenerator() {
-        super(new LevelThreeBiomeSource());
+    public LevelThreeChunkGenerator(RegistryEntryLookup<Biome> biomeRegistry) {
+        super(new LevelThreeBiomeSource(biomeRegistry));
     }
 
     @Override

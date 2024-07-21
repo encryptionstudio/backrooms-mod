@@ -23,8 +23,10 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.registry.Registry;
 import net.minecraft.registry.RegistryCodecs;
+import net.minecraft.registry.RegistryEntryLookup;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.registry.RegistryKeys;
+import net.minecraft.registry.RegistryOps;
 import net.minecraft.world.ChunkRegion;
 import net.minecraft.world.HeightLimitView;
 import net.minecraft.world.Heightmap;
@@ -43,7 +45,10 @@ import net.minecraft.world.gen.noise.NoiseConfig;
 
 public class LevelOneChunkGenerator extends ChunkGenerator {
 
-	public static final Codec<LevelOneChunkGenerator> CODEC = Codec.unit(new LevelOneChunkGenerator());
+	public static final Codec<LevelOneChunkGenerator> CODEC = RecordCodecBuilder.create((instance) ->
+			instance.group(RegistryOps.getEntryLookupCodec(RegistryKeys.BIOME),
+                           RegistryOps.getEntryLookupCodec(RegistryKeys.BLOCK))
+					.apply(instance, instance.stable(LevelOneChunkGenerator::new)));
     private CementHallsChunkGenerator cementHallsChunkGenerator;
     private ParkingGarageChunkGenerator parkingGarageChunkGenerator;
     private WarehouseChunkGenerator warehouseChunkGenerator;
@@ -55,12 +60,11 @@ public class LevelOneChunkGenerator extends ChunkGenerator {
     private static final BlockState ROOF_BLOCK = BackroomsBlocks.BEDROCK_BRICKS.getDefaultState();
 
     private static final int ROOF_BEGIN_Y = 8 * (getFloorCount() + 1) + 1;
-    
-	private final Registry<Biome> biomeRegistry;
+    private RegistryEntryLookup<Block> blockLookup;
 
-	public LevelOneChunkGenerator() {
-		super(new LevelOneBiomeSource());
-		this.biomeRegistry = null;
+	public LevelOneChunkGenerator(RegistryEntryLookup<Biome> biomeRegistry, RegistryEntryLookup<Block> blockLookup) {
+		super(new LevelOneBiomeSource(biomeRegistry));
+        this.blockLookup = blockLookup;
 	}
 
 	@Override
@@ -109,9 +113,9 @@ public class LevelOneChunkGenerator extends ChunkGenerator {
             StructureAccessor structureAccessor, Chunk chunk) {
 
         if (this.cementHallsChunkGenerator == null) {
-            this.cementHallsChunkGenerator = new CementHallsChunkGenerator(biomeSource, BackroomsLevels.LEVEL_1_WORLD.getSeed());
-            this.parkingGarageChunkGenerator= new ParkingGarageChunkGenerator(biomeSource, BackroomsLevels.LEVEL_1_WORLD.getSeed());
-            this.warehouseChunkGenerator = new WarehouseChunkGenerator(biomeSource, BackroomsLevels.LEVEL_1_WORLD.getSeed());
+            this.cementHallsChunkGenerator = new CementHallsChunkGenerator(biomeSource, BackroomsLevels.LEVEL_1_WORLD.getSeed(), this.blockLookup);
+            this.parkingGarageChunkGenerator= new ParkingGarageChunkGenerator(biomeSource, BackroomsLevels.LEVEL_1_WORLD.getSeed(), this.blockLookup);
+            this.warehouseChunkGenerator = new WarehouseChunkGenerator(biomeSource, BackroomsLevels.LEVEL_1_WORLD.getSeed(), this.blockLookup);
         }
         // IMPORTANT NOTE:
         // For biomes generation we're using various "placeholder" blocks to replace them later with blocks we actually need in biomes.

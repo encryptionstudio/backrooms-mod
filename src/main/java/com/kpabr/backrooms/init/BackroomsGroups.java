@@ -25,7 +25,6 @@ public class BackroomsGroups {
 		.displayName(Text.translatable("itemGroup.backrooms.items"))
 		.build();
 
-		// ? DOES THIS WORK?
 		public static void init() {
 			Registry.register(Registries.ITEM_GROUP, ITEMS_GROUP_KEY, ITEMS_GROUP);
 			

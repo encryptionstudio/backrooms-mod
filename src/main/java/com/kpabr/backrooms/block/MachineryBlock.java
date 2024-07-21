@@ -32,7 +32,6 @@ public class MachineryBlock extends Block {
 				for (int j = 0; j <= 4; j++) {
 					for (int k = -14; k <= 14; k++) {
 						BlockPos lightPos = pos.add(i,j,k);
-						//BackroomsMod.LOGGER.info(lightPos.toString());
 						if(world.getBlockState(lightPos).getBlock()==BackroomsBlocks.REPAIRED_FLUORESCENT_LIGHT){
 							world.setBlockState(lightPos, BackroomsBlocks.REPAIRED_FLUORESCENT_LIGHT.getDefaultState().with(Properties.LIT, true), 1, 0);
 						}

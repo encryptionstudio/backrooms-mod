@@ -37,7 +37,10 @@ import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.registry.Registry;
+import net.minecraft.registry.RegistryEntryLookup;
+import net.minecraft.registry.RegistryKey;
 import net.minecraft.registry.RegistryKeys;
+import net.minecraft.registry.RegistryOps;
 import net.minecraft.registry.SimpleRegistry;
 import net.minecraft.world.ChunkRegion;
 import net.minecraft.world.HeightLimitView;
@@ -66,7 +69,8 @@ public class WarehouseChunkGenerator extends ChunkGenerator {
                          .forGetter((chunkGenerator) -> chunkGenerator.biomeSource),
                  Codec.LONG.fieldOf("seed")
                          .stable()
-                         .forGetter((chunkGenerator) -> chunkGenerator.worldSeed)
+                         .forGetter((chunkGenerator) -> chunkGenerator.worldSeed),
+                 RegistryOps.getEntryLookupCodec(RegistryKeys.BLOCK)
          ).apply(instance, instance.stable(WarehouseChunkGenerator::new))
     );
 
@@ -85,10 +89,12 @@ public class WarehouseChunkGenerator extends ChunkGenerator {
 
     private final HashMap<String, NbtPlacerUtil> loadedStructures = new HashMap<String, NbtPlacerUtil>(30);
     private Identifier nbtId = BackroomsMod.id("level_1");
+    private RegistryEntryLookup<Block> blockLookup;
     
-    public WarehouseChunkGenerator(BiomeSource biomeSource, long worldSeed) {
+    public WarehouseChunkGenerator(BiomeSource biomeSource, long worldSeed, RegistryEntryLookup<Block> blockLookup) {
         super(biomeSource);
         this.worldSeed = worldSeed;
+        this.blockLookup = blockLookup;
     }
 
     @Override
@@ -173,7 +179,6 @@ public class WarehouseChunkGenerator extends ChunkGenerator {
                             case SOUTH -> BlockRotation.CLOCKWISE_90;
                             default -> BlockRotation.CLOCKWISE_180;
                         };
-                        //BackroomsMod.LOGGER.info(dir +" & " + rotation);
                         generateNbt(chunk, new BlockPos(startX + x * 8, 2 + 8 * y, startZ + z * 8), "warehouse_" + ((shelfType & 3) + 4), rotation); //Actually generate the shelf.
                         //commented former code: generateNbt(chunk, new BlockPos(startX + x * 8, 2 + 8 * y, startZ + z * 8), "warehouse_5", BlockRotation.NONE);
                     }
@@ -266,7 +271,7 @@ public class WarehouseChunkGenerator extends ChunkGenerator {
     }
 
     private void store(String id, ServerWorld world) {
-		loadedStructures.put(id, NbtPlacerUtil.load(world.getServer().getResourceManager(), new Identifier(this.nbtId.getNamespace(), "nbt/" + this.nbtId.getPath() + "/" + id + ".nbt")).get());
+		loadedStructures.put(id, NbtPlacerUtil.load(world.getServer().getResourceManager(), new Identifier(this.nbtId.getNamespace(), "nbt/" + this.nbtId.getPath() + "/" + id + ".nbt"), this.blockLookup).get());
 	}
 
 	private void store(String id, ServerWorld world, int from, int to) {
@@ -363,7 +368,7 @@ public class WarehouseChunkGenerator extends ChunkGenerator {
 	}
 
 	private void generateNbt(Chunk region, BlockPos at, String id, BlockRotation rotation) {
-		loadedStructures.get(id).rotate(rotation).generateNbt(region, at, (pos, state, nbt) -> this.modifyStructure(region, pos, state, nbt));
+		loadedStructures.get(id).rotate(rotation, this.blockLookup).generateNbt(region, at, (pos, state, nbt) -> this.modifyStructure(region, pos, state, nbt));
 	}
 
     @Override

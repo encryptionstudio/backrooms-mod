@@ -37,7 +37,6 @@ public class RegistryHelper {
 
     public static RegistryKey<Biome> get(String id, Biome biome) {
         RegistryKey<Biome> key = RegistryKey.of(RegistryKeys.BIOME, BackroomsMod.id(id));
-        BackroomsLevels.BIOME_REGISTRY.add(key, biome, Lifecycle.stable());
         return key;
     }
 

@@ -37,28 +37,35 @@ import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.registry.Registerable;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
+import net.minecraft.registry.RegistryEntryLookup;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.registry.RegistryKeys;
 import net.minecraft.registry.SimpleRegistry;
+import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.world.TeleportTarget;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
+import net.minecraft.world.biome.OverworldBiomeCreator;
+import net.minecraft.world.biome.TheNetherBiomeCreator;
 import net.minecraft.world.biome.source.BiomeSource;
 import net.minecraft.world.dimension.DimensionOptions;
+import net.minecraft.world.gen.carver.ConfiguredCarver;
 import net.minecraft.world.gen.chunk.ChunkGenerator;
+import net.minecraft.world.gen.feature.PlacedFeature;
 
 import static com.kpabr.backrooms.util.RegistryHelper.get;
 import static net.minecraft.server.command.CommandManager.literal;
+
+import java.util.HashMap;
 
 public class BackroomsLevels {
 
     // Levels Biomes
     // The biome options refer to the JSON-file in the worldgen/biome subfolder of the datapack,
 	// which will always share it's ID with the biome that is created from it
-
-    public static final SimpleRegistry<Biome> BIOME_REGISTRY = new SimpleRegistry<>(RegistryKeys.BIOME, Lifecycle.stable());
 
     // Level 0 biomes
     public static final RegistryKey<Biome> DECREPIT_BIOME = get("decrepit", DecrepitBiome.create());
@@ -76,6 +83,8 @@ public class BackroomsLevels {
     
     // Level 4 biomes
     public static final RegistryKey<Biome> ELECTRICAL_STATION_BIOME = get("electrical_station", ElectricalStationBiome.create());
+
+    public static final HashMap<RegistryKey<Biome>, RegistryEntry<Biome>> BIOME_KEY_TO_ENTRY = new HashMap<RegistryKey<Biome>, RegistryEntry<Biome>>();
 
 
     // Levels/Dimensions

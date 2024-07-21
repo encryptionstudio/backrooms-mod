@@ -16,6 +16,7 @@ import net.minecraft.block.*;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.structure.StructureSet;
+import net.minecraft.structure.StructureTemplateManager;
 import net.minecraft.util.BlockRotation;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
@@ -24,7 +25,9 @@ import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.noise.SimplexNoiseSampler;
 import net.minecraft.registry.Registry;
 import net.minecraft.registry.RegistryCodecs;
+import net.minecraft.registry.RegistryEntryLookup;
 import net.minecraft.registry.RegistryKeys;
+import net.minecraft.registry.RegistryOps;
 import net.minecraft.world.ChunkRegion;
 import net.minecraft.world.HeightLimitView;
 import net.minecraft.world.Heightmap;
@@ -50,7 +53,10 @@ import java.util.concurrent.Executor;
 
 public class LevelTwoChunkGenerator extends ChunkGenerator {
 
-    public static final Codec<LevelTwoChunkGenerator> CODEC = Codec.unit(new LevelTwoChunkGenerator());
+    public static final Codec<LevelTwoChunkGenerator> CODEC = RecordCodecBuilder.create((instance) ->
+			instance.group(RegistryOps.getEntryLookupCodec(RegistryKeys.BIOME),
+                           RegistryOps.getEntryLookupCodec(RegistryKeys.BLOCK))
+					.apply(instance, instance.stable(LevelTwoChunkGenerator::new)));
     private final HashMap<String, NbtPlacerUtil> loadedStructures = new HashMap<String, NbtPlacerUtil>(30);
     private Identifier nbtId = BackroomsMod.id("level_2");
 
@@ -79,9 +85,12 @@ public class LevelTwoChunkGenerator extends ChunkGenerator {
             .with(PipeBlock.DOWN, false)
             .with(PipeBlock.NORTH, false)
             .with(PipeBlock.SOUTH, false);
+    
+            private RegistryEntryLookup<Block> blockLookup;
 
-    public LevelTwoChunkGenerator() {
-        super(new LevelTwoBiomeSource());
+    public LevelTwoChunkGenerator(RegistryEntryLookup<Biome> biomeRegistry, RegistryEntryLookup<Block> blockLookup) {
+        super(new LevelTwoBiomeSource(biomeRegistry));
+        this.blockLookup = blockLookup;
     }
 
     @Override
@@ -388,7 +397,7 @@ public class LevelTwoChunkGenerator extends ChunkGenerator {
         store("corridor", world);
     }
     private void store(String id, ServerWorld world) {
-		loadedStructures.put(id, NbtPlacerUtil.load(world.getServer().getResourceManager(), new Identifier(this.nbtId.getNamespace(), "nbt/" + this.nbtId.getPath() + "/" + id + ".nbt")).get());
+		loadedStructures.put(id, NbtPlacerUtil.load(world.getServer().getResourceManager(), new Identifier(this.nbtId.getNamespace(), "nbt/" + this.nbtId.getPath() + "/" + id + ".nbt"), this.blockLookup).get());
 	}
 
     @Override
@@ -512,7 +521,7 @@ public class LevelTwoChunkGenerator extends ChunkGenerator {
     }
 
     private void generateNbt(Chunk region, BlockPos at, String id, BlockRotation rotation) {
-		loadedStructures.get(id).rotate(rotation).generateNbt(region, at, (pos, state, nbt) -> this.modifyStructure(region, pos, state, nbt));
+		loadedStructures.get(id).rotate(rotation, this.blockLookup).generateNbt(region, at, (pos, state, nbt) -> this.modifyStructure(region, pos, state, nbt));
 	}
 
     private void generateNbt(Chunk region, BlockPos at, String id) {

@@ -20,7 +20,6 @@ import net.minecraft.registry.Registry;
 import net.minecraft.registry.RegistryKey;
 
 public class BackroomsItems {
-	// ? DOES THIS WORK?
 	private static HashMap<RegistryKey<ItemGroup>, ArrayList<Item>> GROUPED_ITEMS = new HashMap<RegistryKey<ItemGroup>, ArrayList<Item>>();
 	public static ArrayList<ItemEntry> ITEMS = new ArrayList<>();
 	public static ArrayList<BlockItem> BLOCK_ITEMS = new ArrayList<>();
