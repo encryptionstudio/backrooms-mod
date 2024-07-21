@@ -7,7 +7,7 @@
       "fog_color": 11548232,
       "water_color": 13548960,
       "water_fog_color": 16735821,
-      "ambient_sound": "humbuzz"
+      "ambient_sound": "backrooms:humbuzz"
     },
     "spawners": {
       "creature": [

@@ -7,8 +7,7 @@
       "fog_color": 13548960,
       "water_color": 13548960,
       "water_fog_color": 13548960,
-      "grass_color": 13818488,
-      "ambient_sound": "humbuzz"
+      "grass_color": 13818488
     },
     "spawners": {
       "creature": [
