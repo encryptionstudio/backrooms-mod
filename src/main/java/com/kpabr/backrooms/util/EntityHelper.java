@@ -24,6 +24,7 @@ public class EntityHelper {
             }
         }
 
-        entity.teleport((ServerWorld) world, mutBlockPos.getX() + 0.5, mutBlockPos.getY(), mutBlockPos.getZ() + 0.5, entity.getYaw(), entity.getPitch());
+        entity.teleport((ServerWorld) world, mutBlockPos.getX() + 0.5, mutBlockPos.getY(), mutBlockPos.getZ() + 0.5,
+                entity.getYaw(), entity.getPitch());
     }
 }

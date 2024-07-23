@@ -23,7 +23,8 @@ public class SkyboxShaders {
 	public static ShaderProgram SKYBOX_SHADER;
 
 	public static void addAll(List<BakedQuad> list, BakedModel model, BlockState state, Direction dir, Random random) {
-		list.addAll(model.getQuads(state, dir, random).stream().filter((quad) -> quad.getSprite().getAtlasId().getPath().startsWith("sky/")).toList());
+		list.addAll(model.getQuads(state, dir, random).stream()
+				.filter((quad) -> quad.getSprite().getAtlasId().getPath().startsWith("sky/")).toList());
 	}
 
 	public static void addAll(List<BakedQuad> list, BakedModel model, BlockState state, Direction dir) {
@@ -43,7 +44,8 @@ public class SkyboxShaders {
 		int j = js.length / 8;
 		MemoryStack memoryStack = MemoryStack.stackPush();
 		try {
-			ByteBuffer byteBuffer = memoryStack.malloc(VertexFormats.POSITION_COLOR_TEXTURE_LIGHT_NORMAL.getVertexSizeByte());
+			ByteBuffer byteBuffer = memoryStack
+					.malloc(VertexFormats.POSITION_COLOR_TEXTURE_LIGHT_NORMAL.getVertexSizeByte());
 			IntBuffer intBuffer = byteBuffer.asIntBuffer();
 
 			for (int k = 0; k < j; ++k) {

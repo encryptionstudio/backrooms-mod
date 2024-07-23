@@ -26,48 +26,59 @@ public class BackroomsItems {
 
 	public static final Item ALMOND_WATER = add("almond_water_bottle",
 			new AlmondWaterItem(new Item.Settings().food(
-					new FoodComponent.Builder().alwaysEdible().snack().saturationModifier(20).hunger(0).build()).maxCount(16)), ItemGroups.FOOD_AND_DRINK);
+					new FoodComponent.Builder().alwaysEdible().snack().saturationModifier(20).hunger(0).build())
+					.maxCount(16)),
+			ItemGroups.FOOD_AND_DRINK);
 	public static final Item FIRESALT = add("firesalt",
 			new FireSalt(new Item.Settings()), ItemGroups.COMBAT);
 	public static final Item TILEMOLD_LUMP = add("tilemold_lump",
-			new Item(new Item.Settings()), ItemGroups.INGREDIENTS);
+			new Item(new Item.Settings()), ItemGroups.NATURAL);
 	public static final Item BAKED_TILEMOLD_LUMP = add("baked_tilemold_lump",
-			new Item(new Item.Settings().food(new FoodComponent.Builder().snack().saturationModifier(2).hunger(2).build())), ItemGroups.FOOD_AND_DRINK);
+			new Item(new Item.Settings()
+					.food(new FoodComponent.Builder().snack().saturationModifier(2).hunger(2).build())),
+			ItemGroups.FOOD_AND_DRINK);
 	public static final Item TAINTED_FLESH = add("tainted_flesh",
-			new Item(new Item.Settings().food(new FoodComponent.Builder().saturationModifier(0).hunger(3).statusEffect(new StatusEffectInstance(StatusEffects.HUNGER, 600, 0), 0.8F).meat().build())), ItemGroups.FOOD_AND_DRINK);
+			new Item(new Item.Settings().food(new FoodComponent.Builder().saturationModifier(0).hunger(3)
+					.statusEffect(new StatusEffectInstance(StatusEffects.HUNGER, 600, 0), 0.8F).meat().build())),
+			ItemGroups.FOOD_AND_DRINK);
 	public static final Item COOKED_FLESH = add("cooked_flesh",
-			new Item(new Item.Settings().food(new FoodComponent.Builder().saturationModifier(3).hunger(5).meat().build())), ItemGroups.FOOD_AND_DRINK);
+			new Item(new Item.Settings()
+					.food(new FoodComponent.Builder().saturationModifier(3).hunger(5).meat().build())),
+			ItemGroups.FOOD_AND_DRINK);
 	public static final Item ALMOND_WATER_BUCKET = add("almond_water_bucket",
-			new BucketItem(BackroomsFluids.STILL_ALMOND_WATER, new Item.Settings().recipeRemainder(Items.BUCKET).maxCount(1)), ItemGroups.FOOD_AND_DRINK);
+			new BucketItem(BackroomsFluids.STILL_ALMOND_WATER,
+					new Item.Settings().recipeRemainder(Items.BUCKET).maxCount(1)),
+			ItemGroups.FOOD_AND_DRINK);
 	public static final Item HOUND_SPAWN_EGG = add("hound_spawn_egg",
-			new SpawnEggItem(BackroomsEntities.HOUND,16777215,8531483,new Item.Settings()), ItemGroups.NATURAL);
+			new SpawnEggItem(BackroomsEntities.HOUND, 16777215, 8531483, new Item.Settings()), ItemGroups.SPAWN_EGGS);
 	public static final Item WRETCH_SPAWN_EGG = add("wretch_spawn_egg",
-			new SpawnEggItem(BackroomsEntities.WRETCH,Color.of(120, 5, 5), Color.of(89, 7, 7) ,
-					new Item.Settings()), ItemGroups.NATURAL);
+			new SpawnEggItem(BackroomsEntities.WRETCH, Color.of(120, 5, 5), Color.of(89, 7, 7),
+					new Item.Settings()),
+			ItemGroups.SPAWN_EGGS);
 	public static final Item COLOMBINA_MASK = add(
-			new MaskItem(BackroomsBlocks.COLOMBINA_MASK, new Item.Settings().maxCount(1)), ItemGroups.FUNCTIONAL);
+			new MaskItem(BackroomsBlocks.COLOMBINA_MASK, new Item.Settings().maxCount(1)), ItemGroups.COMBAT);
 	public static final Item HARLEQUIN_MASK = add(
-			new MaskItem(BackroomsBlocks.HARLEQUIN_MASK, new Item.Settings().maxCount(1)), ItemGroups.FUNCTIONAL);
+			new MaskItem(BackroomsBlocks.HARLEQUIN_MASK, new Item.Settings().maxCount(1)), ItemGroups.COMBAT);
 	public static final Item SOCK_BUSKIN_MASK = add(
-			new MaskItem(BackroomsBlocks.SOCK_BUSKIN_MASK, new Item.Settings().maxCount(1)), ItemGroups.FUNCTIONAL);
+			new MaskItem(BackroomsBlocks.SOCK_BUSKIN_MASK, new Item.Settings().maxCount(1)), ItemGroups.COMBAT);
 
 	private static <I extends Item> I add(String name, I item, RegistryKey<ItemGroup> tab) {
 
-		if(!GROUPED_ITEMS.containsKey(tab)) {
+		if (!GROUPED_ITEMS.containsKey(tab)) {
 			GROUPED_ITEMS.put(tab, new ArrayList<Item>());
 		}
-			
+
 		GROUPED_ITEMS.get(tab).add(item);
 
 		ITEMS.add(new ItemEntry(BackroomsMod.id(name), item));
 		return item;
 	}
 
-	private static<T extends BlockItem> Item add(T item, RegistryKey<ItemGroup> tab) {
-		if(!GROUPED_ITEMS.containsKey(tab)) {
+	private static <T extends BlockItem> Item add(T item, RegistryKey<ItemGroup> tab) {
+		if (!GROUPED_ITEMS.containsKey(tab)) {
 			GROUPED_ITEMS.put(tab, new ArrayList<Item>());
 		}
-			
+
 		GROUPED_ITEMS.get(tab).add(item);
 
 		BLOCK_ITEMS.add(item);
@@ -84,7 +95,7 @@ public class BackroomsItems {
 
 		for (RegistryKey<ItemGroup> groupKey : GROUPED_ITEMS.keySet()) {
 			ItemGroupEvents.modifyEntriesEvent(groupKey)
-				.register((itemGroup) -> addAllItemsToGroup(itemGroup, groupKey));
+					.register((itemGroup) -> addAllItemsToGroup(itemGroup, groupKey));
 		}
 	}
 
@@ -96,6 +107,7 @@ public class BackroomsItems {
 		}
 	}
 
-	private record ItemEntry(Identifier identifier, Item item) {}
+	public record ItemEntry(Identifier identifier, Item item) {
+	}
 
 }

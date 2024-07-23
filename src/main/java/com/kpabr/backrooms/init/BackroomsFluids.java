@@ -13,7 +13,8 @@ public class BackroomsFluids {
     private static final ArrayList<FluidEntry> FLUIDS = new ArrayList<>();
 
     public static final FlowableFluid STILL_ALMOND_WATER = add("almond_water", new AlmondWaterFluid.Still());
-    public static final FlowableFluid FLOWING_ALMOND_WATER = add("flowing_almond_water", new AlmondWaterFluid.Flowing());
+    public static final FlowableFluid FLOWING_ALMOND_WATER = add("flowing_almond_water",
+            new AlmondWaterFluid.Flowing());
 
     private static <F extends FlowableFluid> F add(String name, F fluid) {
         FLUIDS.add(new FluidEntry(BackroomsMod.id(name), fluid));
@@ -26,5 +27,6 @@ public class BackroomsFluids {
         }
     }
 
-    private record FluidEntry(Identifier identifier, FlowableFluid fluid) {}
+    private record FluidEntry(Identifier identifier, FlowableFluid fluid) {
+    }
 }

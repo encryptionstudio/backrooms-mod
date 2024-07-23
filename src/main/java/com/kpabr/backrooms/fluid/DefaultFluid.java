@@ -35,7 +35,8 @@ public abstract class DefaultFluid extends FlowableFluid {
     }
 
     @Override
-    protected boolean canBeReplacedWith(FluidState fluidState, BlockView blockView, BlockPos blockPos, Fluid fluid, Direction direction) {
+    protected boolean canBeReplacedWith(FluidState fluidState, BlockView blockView, BlockPos blockPos, Fluid fluid,
+            Direction direction) {
         return false;
     }
 

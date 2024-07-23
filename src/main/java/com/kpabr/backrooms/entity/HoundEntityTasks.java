@@ -18,6 +18,7 @@ public final class HoundEntityTasks {
     private static final double SPEED_WHEN_FOLLOWING_PER_SECOND = 2.8d;
     private static final double SPEED_WHEN_PLAYER_HID_PER_SECOND = 1.0d;
     private static final long ATTACK_ANIMATION_LENGTH_IN_MS = 480;
+
     /**
      * All information about all entities tasks presented in dev channel
      */
@@ -31,20 +32,17 @@ public final class HoundEntityTasks {
 
         @Override
         public void tick() {
-            if(this.owner.getTarget() == null && isPlayerFound()) return;
+            if (this.owner.getTarget() == null && isPlayerFound())
+                return;
 
-            if (canCreateNewPathWhenIdling())
-            {
+            if (canCreateNewPathWhenIdling()) {
                 final Vec3d randomPath = FuzzyTargeting.find(this.owner, 15, 4);
 
-                if(randomPath != null && this.owner.getNavigation().startMovingTo(
-                        randomPath.x, randomPath.y, randomPath.z, SPEED_WHEN_IDLING_PER_SECOND))
-                {
+                if (randomPath != null && this.owner.getNavigation().startMovingTo(
+                        randomPath.x, randomPath.y, randomPath.z, SPEED_WHEN_IDLING_PER_SECOND)) {
                     this.owner.setAnimation(AnimationEnum.WALKING);
                     this.owner.setAiTask(Text.literal("Idling:Moving"));
-                }
-                else
-                {
+                } else {
                     this.owner.setAnimation(AnimationEnum.IDLING);
                     this.owner.setAiTask(Text.literal("Idling:Idling"));
                 }
@@ -58,12 +56,13 @@ public final class HoundEntityTasks {
 
             if (player != null && this.owner.canSee(player) && !player.isCreative() && !player.isSpectator()) {
                 // I messed up something in the check, and it didn't work lol
-                //if (Math.abs(MathUtil.getYawBetweenEntities(this.owner, player) - this.owner.getYaw()) <= 180) {
+                // if (Math.abs(MathUtil.getYawBetweenEntities(this.owner, player) -
+                // this.owner.getYaw()) <= 180) {
                 this.controller.popState();
                 this.controller.pushState(new AttackingTask(this.owner, player));
                 this.owner.getNavigation().stop();
                 return true;
-                //}
+                // }
             }
             return false;
         }
@@ -90,10 +89,10 @@ public final class HoundEntityTasks {
 
         @Override
         public void tick() {
-            if(this.cooldown > 0) --this.cooldown;
+            if (this.cooldown > 0)
+                --this.cooldown;
 
-            if(!isPlayerTargetable(targetPlayer))
-            {
+            if (!isPlayerTargetable(targetPlayer)) {
                 this.owner.getNavigation().stop();
                 this.owner.setAnimation(AnimationEnum.IDLING);
                 this.controller.popState();
@@ -102,26 +101,22 @@ public final class HoundEntityTasks {
 
             final boolean cannotSeePlayer = !this.owner.canSee(targetPlayer);
 
-            if(cannotSeePlayer)
-            {
+            if (cannotSeePlayer) {
                 this.controller.popState();
                 this.owner.getNavigation().stop();
-                if(this.owner.getNavigation().startMovingTo(this.targetPlayer, SPEED_WHEN_PLAYER_HID_PER_SECOND))
-                {
+                if (this.owner.getNavigation().startMovingTo(this.targetPlayer, SPEED_WHEN_PLAYER_HID_PER_SECOND)) {
                     this.controller.pushState(new SearchingPlayerTask(owner, targetPlayer));
                 }
                 return;
             }
 
-            if(!isAttackAnimationInProgress()) {
-                if(cooldown == 0 && this.owner.squaredDistanceTo(this.targetPlayer) <= getSquaredMaxAttackDistance())
-                {
+            if (!isAttackAnimationInProgress()) {
+                if (cooldown == 0 && this.owner.squaredDistanceTo(this.targetPlayer) <= getSquaredMaxAttackDistance()) {
                     attackPlayer();
                     return;
                 }
 
-                if(this.owner.getNavigation().startMovingTo(this.targetPlayer, SPEED_WHEN_FOLLOWING_PER_SECOND))
-                {
+                if (this.owner.getNavigation().startMovingTo(this.targetPlayer, SPEED_WHEN_FOLLOWING_PER_SECOND)) {
                     this.owner.setAnimation(AnimationEnum.RUNNING);
                     this.owner.setAiTask(Text.literal("Attacking:Running"));
                 }
@@ -131,14 +126,17 @@ public final class HoundEntityTasks {
         private float getSquaredMaxAttackDistance() {
             return this.owner.getWidth() * 2.0F * this.owner.getWidth() * 2.0F + this.targetPlayer.getWidth();
         }
+
         private static boolean isPlayerTargetable(PlayerEntity player) {
             return player.isAlive() && !player.isSpectator() && !player.isCreative();
         }
+
         private boolean isAttackAnimationInProgress() {
             return this.owner.getAnimation() == AnimationEnum.ATTACKING.ordinal();
         }
+
         private void attackPlayer() {
-            if(this.owner.tryAttack(this.targetPlayer)) {
+            if (this.owner.tryAttack(this.targetPlayer)) {
                 this.owner.setAiTask(Text.literal("Attacking:Attacking"));
                 this.owner.playSound(
                         BackroomsSounds.HOUND_ATTACK,
@@ -175,7 +173,7 @@ public final class HoundEntityTasks {
                 this.controller.popState();
                 this.controller.pushState(new AttackingTask(this.owner, this.targetPlayer));
             } else if (this.owner.getNavigation().isIdle()) {
-                if(this.isAnimationDone) {
+                if (this.isAnimationDone) {
                     this.controller.popState();
                 } else {
                     this.owner.setAiTask(Text.literal("Searching:Looking"));

@@ -10,19 +10,13 @@ import net.fabricmc.api.Environment;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.damage.DamageSource;
-import net.minecraft.entity.damage.DamageTypes;
 import net.minecraft.entity.projectile.thrown.ThrownItemEntity;
 import net.minecraft.item.Item;
 import net.minecraft.particle.ParticleEffect;
-import net.minecraft.registry.RegistryKeys;
-import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.world.World;
-import net.minecraft.world.explosion.Explosion;
-import net.minecraft.world.explosion.ExplosionBehavior;
 
 public class FireSaltProjectileEntity extends ThrownItemEntity {
 
@@ -65,17 +59,18 @@ public class FireSaltProjectileEntity extends ThrownItemEntity {
 
         this.getWorld().playSound(null, entity.getBlockPos(), FIRESALT_LAND_EVENT, SoundCategory.BLOCKS, 1f, 1f);
         entity.setOnFire(true);
-        this.getWorld().createExplosion(this, (double) entity.getBlockX(), (double) entity.getBlockY() + 0.5, (double) entity.getBlockZ(), 0.5f, true, World.ExplosionSourceType.NONE);
+        this.getWorld().createExplosion(this, (double) entity.getBlockX(), (double) entity.getBlockY() + 0.5,
+                (double) entity.getBlockZ(), 0.5f, true, World.ExplosionSourceType.NONE);
     }
-
 
     protected void onCollision(HitResult hitResult) {
         super.onCollision(hitResult);
-        if (!this.getWorld().isClient) {
+        if (!this.getWorld().isClient()) {
             this.getWorld().sendEntityStatus(this, (byte) 3); // particles
             this.getWorld().playSound(null, this.getBlockPos(), FIRESALT_LAND_EVENT, SoundCategory.BLOCKS, 1f, 1f);
             this.kill();
-            this.getWorld().createExplosion(this, (double) this.getBlockX(), (double) this.getBlockY() + 0.5, (double) this.getBlockZ(), 0.5f, true, World.ExplosionSourceType.NONE);
+            this.getWorld().createExplosion(this, (double) this.getBlockX(), (double) this.getBlockY() + 0.5,
+                    (double) this.getBlockZ(), 0.5f, true, World.ExplosionSourceType.NONE);
         }
     }
 }

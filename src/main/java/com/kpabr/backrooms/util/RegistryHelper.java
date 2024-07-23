@@ -2,12 +2,10 @@ package com.kpabr.backrooms.util;
 
 import com.mojang.datafixers.types.Type;
 import com.mojang.serialization.Codec;
-import com.mojang.serialization.Lifecycle;
 
 import net.fabricmc.fabric.api.item.v1.FabricItemSettings;
 import net.fabricmc.fabric.api.object.builder.v1.block.entity.FabricBlockEntityTypeBuilder;
 import com.kpabr.backrooms.BackroomsMod;
-import com.kpabr.backrooms.init.BackroomsLevels;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.entity.BlockEntity;
@@ -35,7 +33,7 @@ public class RegistryHelper {
         return Registry.register(Registries.CHUNK_GENERATOR, BackroomsMod.id(id), chunkGenerator);
     }
 
-    public static RegistryKey<Biome> get(String id, Biome biome) {
+    public static RegistryKey<Biome> getBiome(String id) {
         RegistryKey<Biome> key = RegistryKey.of(RegistryKeys.BIOME, BackroomsMod.id(id));
         return key;
     }

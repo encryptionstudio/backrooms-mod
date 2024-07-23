@@ -31,20 +31,17 @@ public final class WretchEntityTasks {
 
         @Override
         public void tick() {
-            if(this.owner.getTarget() == null && isPlayerFound()) return;
+            if (this.owner.getTarget() == null && isPlayerFound())
+                return;
 
-            if (canCreateNewPathWhenIdling())
-            {
+            if (canCreateNewPathWhenIdling()) {
                 final Vec3d randomPath = FuzzyTargeting.find(this.owner, 15, 4);
 
-                if(randomPath != null && this.owner.getNavigation().startMovingTo(
-                        randomPath.x, randomPath.y, randomPath.z, SPEED_WHEN_IDLING_PER_SECOND))
-                {
+                if (randomPath != null && this.owner.getNavigation().startMovingTo(
+                        randomPath.x, randomPath.y, randomPath.z, SPEED_WHEN_IDLING_PER_SECOND)) {
                     this.owner.setAnimation(AnimationEnum.MOVING);
                     this.owner.setAiTask(Text.literal("Idling:Moving"));
-                }
-                else
-                {
+                } else {
                     this.owner.setAnimation(AnimationEnum.IDLING);
                     this.owner.setAiTask(Text.literal("Idling:Idling"));
                 }
@@ -58,12 +55,13 @@ public final class WretchEntityTasks {
 
             if (player != null && this.owner.canSee(player) && !player.isCreative() && !player.isSpectator()) {
                 // I messed up something in the check, and it didn't work lol
-                //if (Math.abs(MathUtil.getYawBetweenEntities(this.owner, player) - this.owner.getYaw()) <= 180) {
-                    this.controller.popState();
-                    this.controller.pushState(new AttackingTask(this.owner, player));
-                    this.owner.getNavigation().stop();
-                    return true;
-                //}
+                // if (Math.abs(MathUtil.getYawBetweenEntities(this.owner, player) -
+                // this.owner.getYaw()) <= 180) {
+                this.controller.popState();
+                this.controller.pushState(new AttackingTask(this.owner, player));
+                this.owner.getNavigation().stop();
+                return true;
+                // }
             }
             return false;
         }
@@ -82,7 +80,8 @@ public final class WretchEntityTasks {
 
         public AttackingTask(WretchEntity owner, @NotNull PlayerEntity targetPlayer) {
             super(owner);
-            this.targetPlayer = Objects.requireNonNull(targetPlayer, "targetPlayer parameter must be not null!");;
+            this.targetPlayer = Objects.requireNonNull(targetPlayer, "targetPlayer parameter must be not null!");
+            ;
             this.cooldown = 0;
 
             owner.setAiTask(Text.literal("Attacking:Nothing"));
@@ -90,10 +89,10 @@ public final class WretchEntityTasks {
 
         @Override
         public void tick() {
-            if(this.cooldown > 0) --this.cooldown;
+            if (this.cooldown > 0)
+                --this.cooldown;
 
-            if(!isPlayerTargetable(targetPlayer))
-            {
+            if (!isPlayerTargetable(targetPlayer)) {
                 this.owner.getNavigation().stop();
                 this.owner.setAnimation(AnimationEnum.IDLING);
 
@@ -103,26 +102,22 @@ public final class WretchEntityTasks {
 
             final boolean cannotSeePlayer = !this.owner.canSee(targetPlayer);
 
-            if(cannotSeePlayer)
-            {
+            if (cannotSeePlayer) {
                 this.controller.popState();
                 this.owner.getNavigation().stop();
-                if(this.owner.getNavigation().startMovingTo(this.targetPlayer, SPEED_WHEN_PLAYER_HID_PER_SECOND))
-                {
+                if (this.owner.getNavigation().startMovingTo(this.targetPlayer, SPEED_WHEN_PLAYER_HID_PER_SECOND)) {
                     this.controller.pushState(new SearchingPlayerTask(owner, targetPlayer));
                 }
                 return;
             }
 
-            if(!isAttackAnimationInProgress()) {
-                if(cooldown == 0 && this.owner.squaredDistanceTo(this.targetPlayer) <= getSquaredMaxAttackDistance())
-                {
+            if (!isAttackAnimationInProgress()) {
+                if (cooldown == 0 && this.owner.squaredDistanceTo(this.targetPlayer) <= getSquaredMaxAttackDistance()) {
                     attackPlayer();
                     return;
                 }
 
-                if(this.owner.getNavigation().startMovingTo(this.targetPlayer, SPEED_WHEN_FOLLOWING_PER_SECOND))
-                {
+                if (this.owner.getNavigation().startMovingTo(this.targetPlayer, SPEED_WHEN_FOLLOWING_PER_SECOND)) {
                     this.owner.setAnimation(AnimationEnum.MOVING);
                     this.owner.setAiTask(Text.literal("Attacking:Moving"));
                 }
@@ -132,14 +127,17 @@ public final class WretchEntityTasks {
         private float getSquaredMaxAttackDistance() {
             return this.owner.getWidth() * 2.0F * this.owner.getWidth() * 2.0F + this.targetPlayer.getWidth();
         }
+
         private static boolean isPlayerTargetable(PlayerEntity player) {
             return player.isAlive() && !player.isSpectator() && !player.isCreative();
         }
+
         private boolean isAttackAnimationInProgress() {
             return this.owner.getAnimation() == AnimationEnum.ATTACKING.ordinal();
         }
+
         private void attackPlayer() {
-            if(this.owner.tryAttack(this.targetPlayer)) {
+            if (this.owner.tryAttack(this.targetPlayer)) {
                 this.owner.setAiTask(Text.literal("Attacking:Attacking"));
 
                 this.owner.setAnimation(AnimationEnum.ATTACKING);

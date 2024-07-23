@@ -23,7 +23,8 @@ public class FluorescentLightBlock extends Block {
 		super(settings);
 	}
 
-	public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
+	public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand,
+			BlockHitResult hit) {
 		state = state.cycle(LIT);
 		world.setBlockState(pos, state, 1, 0);
 

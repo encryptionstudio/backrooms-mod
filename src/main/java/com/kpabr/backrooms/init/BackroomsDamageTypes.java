@@ -9,8 +9,9 @@ import net.minecraft.registry.RegistryKeys;
 import net.minecraft.world.World;
 
 public class BackroomsDamageTypes {
-    public static final RegistryKey<DamageType> WRETCHED_CYCLE_DAMAGE_TYPE = RegistryKey.of(RegistryKeys.DAMAGE_TYPE, BackroomsMod.id("wretched_cycle"));
- 
+    public static final RegistryKey<DamageType> WRETCHED_CYCLE_DAMAGE_TYPE = RegistryKey.of(RegistryKeys.DAMAGE_TYPE,
+            BackroomsMod.id("wretched_cycle"));
+
     public static DamageSource of(World world, RegistryKey<DamageType> key) {
         return new DamageSource(world.getRegistryManager().get(RegistryKeys.DAMAGE_TYPE).entryOf(key));
     }

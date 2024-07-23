@@ -36,32 +36,25 @@ public class MaskBlock extends BlockWithEntity implements Equipment {
             Direction.NORTH, Block.createCuboidShape(4.0, 3.0, 14.0, 12.0, 13.0, 16.0),
             Direction.SOUTH, Block.createCuboidShape(4.0, 3.0, 0.0, 12.0, 13.0, 2.0),
             Direction.EAST, Block.createCuboidShape(0.0, 3.0, 4.0, 2.0, 13.0, 12.0),
-            Direction.WEST, Block.createCuboidShape(14.0, 3.0, 4.0, 16.0, 13.0, 12.0)
-    ));
+            Direction.WEST, Block.createCuboidShape(14.0, 3.0, 4.0, 16.0, 13.0, 12.0)));
     private static final Map<Direction, VoxelShape> COLOMBINA_OUTLINE_SHAPE = Maps.newEnumMap(ImmutableMap.of(
             Direction.NORTH, Block.createCuboidShape(3.0, 5.0, 15.0, 13.0, 10.0, 16.0),
             Direction.SOUTH, Block.createCuboidShape(3.0, 5.0, 0.0, 13.0, 10.0, 1.0),
             Direction.EAST, Block.createCuboidShape(0.0, 5.0, 10.0, 1.0, 10.0, 13.0),
-            Direction.WEST, Block.createCuboidShape(15.0, 5.0, 3.0, 16.0, 10.0, 13.0)
-    ));
+            Direction.WEST, Block.createCuboidShape(15.0, 5.0, 3.0, 16.0, 10.0, 13.0)));
     private static final Map<Direction, VoxelShape> SOCK_BUSKIN_OUTLINE_SHAPE = Maps.newEnumMap(ImmutableMap.of(
             Direction.NORTH, VoxelShapes.union(
                     Block.createCuboidShape(3.0, 0.0, 13.0, 13.0, 7.0, 16.0),
-                    Block.createCuboidShape(2.0, 7.0, 13.0, 14.0, 16.0, 16.0)
-            ),
+                    Block.createCuboidShape(2.0, 7.0, 13.0, 14.0, 16.0, 16.0)),
             Direction.SOUTH, VoxelShapes.union(
                     Block.createCuboidShape(3.0, 0.0, 0.0, 13.0, 7.0, 3.0),
-                    Block.createCuboidShape(2.0, 7.0, 0.0, 12.0, 16.0, 3.0)
-            ),
+                    Block.createCuboidShape(2.0, 7.0, 0.0, 12.0, 16.0, 3.0)),
             Direction.EAST, VoxelShapes.union(
                     Block.createCuboidShape(0.0, 0.0, 3.0, 3.0, 7.0, 13.0),
-                    Block.createCuboidShape(0.0, 7.0, 2.0, 3.0, 16.0, 14.0)
-            ),
+                    Block.createCuboidShape(0.0, 7.0, 2.0, 3.0, 16.0, 14.0)),
             Direction.WEST, VoxelShapes.union(
                     Block.createCuboidShape(13.0, 0.0, 3.0, 16.0, 7.0, 13.0),
-                    Block.createCuboidShape(13.0, 7.0, 2.0, 16.0, 16.0, 14.0)
-            )
-    ));
+                    Block.createCuboidShape(13.0, 7.0, 2.0, 16.0, 16.0, 14.0))));
     private final MaskType maskType;
 
     public MaskBlock(MaskType maskType, Block.Settings settings) {
@@ -71,7 +64,8 @@ public class MaskBlock extends BlockWithEntity implements Equipment {
     }
 
     @Override
-    public void afterBreak(World world, PlayerEntity player, BlockPos pos, BlockState state, BlockEntity blockEntity, ItemStack stack) {
+    public void afterBreak(World world, PlayerEntity player, BlockPos pos, BlockState state, BlockEntity blockEntity,
+            ItemStack stack) {
         player.incrementStat(Stats.MINED.getOrCreateStat(this));
         player.addExhaustion(0.005F);
         dropStack(world, pos, switch (maskType) {
@@ -83,7 +77,7 @@ public class MaskBlock extends BlockWithEntity implements Equipment {
 
     @Override
     public VoxelShape getOutlineShape(BlockState state, BlockView world, BlockPos pos, ShapeContext context) {
-        return switch(maskType) {
+        return switch (maskType) {
             case COLOMBINA -> COLOMBINA_OUTLINE_SHAPE.get(state.get(FACING));
             case HARLEQUIN -> HARLEQUIN_OUTLINE_SHAPE.get(state.get(FACING));
             case SOCK_BUSKIN -> SOCK_BUSKIN_OUTLINE_SHAPE.get(state.get(FACING));
@@ -129,9 +123,11 @@ public class MaskBlock extends BlockWithEntity implements Equipment {
         return new MaskBlockEntity(pos, state);
     }
 
-    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(World world, BlockState state, BlockEntityType<T> type) {
+    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(World world, BlockState state,
+            BlockEntityType<T> type) {
         return !world.isClient ? null : checkType(type, BackroomsBlocks.MASK, MaskBlockEntity::tick);
     }
+
     public BlockRenderType getRenderType(BlockState state) {
         return BlockRenderType.MODEL;
     }

@@ -19,9 +19,6 @@ import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Vec3i;
-import net.minecraft.util.math.BlockPos.Mutable;
 import net.minecraft.world.World;
 
 public class CrateBlockEntity extends LootableContainerBlockEntity {
@@ -42,12 +39,13 @@ public class CrateBlockEntity extends LootableContainerBlockEntity {
                 CrateBlockEntity.this.setOpen(state, false);
             }
 
-            protected void onViewerCountUpdate(World world, BlockPos pos, BlockState state, int oldViewerCount, int newViewerCount) {
+            protected void onViewerCountUpdate(World world, BlockPos pos, BlockState state, int oldViewerCount,
+                    int newViewerCount) {
             }
 
             protected boolean isPlayerViewing(PlayerEntity player) {
                 if (player.currentScreenHandler instanceof GenericContainerScreenHandler) {
-                    Inventory inventory = ((GenericContainerScreenHandler)player.currentScreenHandler).getInventory();
+                    Inventory inventory = ((GenericContainerScreenHandler) player.currentScreenHandler).getInventory();
                     return inventory == CrateBlockEntity.this;
                 } else {
                     return false;
@@ -115,13 +113,14 @@ public class CrateBlockEntity extends LootableContainerBlockEntity {
     }
 
     void setOpen(BlockState state, boolean open) {
-        this.world.setBlockState(this.getPos(), (BlockState)state.with(CrateBlock.OPEN, open), 3);
+        this.world.setBlockState(this.getPos(), (BlockState) state.with(CrateBlock.OPEN, open), 3);
     }
 
     void playSound(BlockState state, SoundEvent soundEvent) {
-            double d = (double)this.pos.getX() + 0.5D;
-            double e = (double)this.pos.getY() + 0.5D;
-            double f = (double)this.pos.getZ() + 0.5D;
-            world.playSound((PlayerEntity)null, d, e, f, soundEvent, SoundCategory.BLOCKS, 0.5F, world.random.nextFloat() * 0.1F + 0.9F);
+        double d = (double) this.pos.getX() + 0.5D;
+        double e = (double) this.pos.getY() + 0.5D;
+        double f = (double) this.pos.getZ() + 0.5D;
+        world.playSound((PlayerEntity) null, d, e, f, soundEvent, SoundCategory.BLOCKS, 0.5F,
+                world.random.nextFloat() * 0.1F + 0.9F);
     }
 }

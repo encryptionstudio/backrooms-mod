@@ -1,6 +1,5 @@
 package com.kpabr.backrooms.mixins;
 
-
 import com.kpabr.backrooms.config.BackroomsConfig;
 import com.kpabr.backrooms.init.BackroomsLevels;
 import net.minecraft.block.BlockState;
@@ -28,11 +27,11 @@ public abstract class EntityMixin {
     @Shadow
     public abstract @Nullable MinecraftServer getServer();
 
-    @Inject(method="tick", at=@At(value = "HEAD"))
+    @Inject(method = "tick", at = @At(value = "HEAD"))
     private void backroomsTick(CallbackInfo ci) {
         World world = ((Entity) (Object) this).getWorld();
         Entity entity = ((Entity) (Object) this);
-        
+
         if (entity instanceof ServerPlayerEntity) {
             if (!world.isClient) {
                 if (isInsideHardBlocks(entity)
@@ -41,10 +40,11 @@ public abstract class EntityMixin {
                     World levelZero = getServer().getWorld(BackroomsLevels.LEVEL_0_WORLD_KEY);
 
                     RegistryKey<World> worldKey = world.getRegistryKey();
-                    if(worldKey == World.OVERWORLD) {
+                    if (worldKey == World.OVERWORLD) {
                         teleportToLevel((ServerPlayerEntity) entity, levelZero);
                     } else if (worldKey == levelZero.getRegistryKey()) {
-                        teleportToLevel((ServerPlayerEntity) entity, getServer().getWorld(BackroomsLevels.LEVEL_1_WORLD_KEY));
+                        teleportToLevel((ServerPlayerEntity) entity,
+                                getServer().getWorld(BackroomsLevels.LEVEL_1_WORLD_KEY));
                     }
                 }
             }
@@ -55,7 +55,7 @@ public abstract class EntityMixin {
         if (entity.noClip) {
             return false;
         }
-        float f = ((EntityAccessor)entity).getDimension().width * 0.8f;
+        float f = ((EntityAccessor) entity).getDimension().width * 0.8f;
         Box box = Box.of(entity.getEyePos(), f, 1.0E-6, f);
 
         return BlockPos.stream(box).anyMatch(pos -> {
@@ -63,11 +63,11 @@ public abstract class EntityMixin {
             return !blockState.isAir()
                     // default checks copied from isInsideWall() method
                     && blockState.shouldSuffocate(entity.getWorld(), pos)
-                    && VoxelShapes.matchesAnywhere(blockState.getCollisionShape(entity.getWorld(), pos).offset(pos.getX(), pos.getY(), pos.getZ()), VoxelShapes.cuboid(box), BooleanBiFunction.AND)
+                    && VoxelShapes.matchesAnywhere(blockState.getCollisionShape(entity.getWorld(), pos)
+                            .offset(pos.getX(), pos.getY(), pos.getZ()), VoxelShapes.cuboid(box), BooleanBiFunction.AND)
                     // if block isn't falling(so it's not gravel or sand)
                     && !(blockState.getBlock() instanceof FallingBlock);
         });
     }
-
 
 }

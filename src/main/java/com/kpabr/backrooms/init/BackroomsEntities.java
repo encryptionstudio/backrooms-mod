@@ -18,12 +18,14 @@ import java.util.ArrayList;
 public class BackroomsEntities {
     private static final ArrayList<EntityEntry> ENTITIES = new ArrayList<>();
     public static final EntityType<HoundEntity> HOUND = add("hound",
-            FabricEntityTypeBuilder.create(SpawnGroup.CREATURE, HoundEntity::new).dimensions(EntityDimensions.fixed(0.76f, 1.0f)).build());
+            FabricEntityTypeBuilder.create(SpawnGroup.CREATURE, HoundEntity::new)
+                    .dimensions(EntityDimensions.fixed(0.76f, 1.0f)).build());
 
     public static final EntityType<WretchEntity> WRETCH = add("wretch",
-            FabricEntityTypeBuilder.create(SpawnGroup.CREATURE, WretchEntity::new).dimensions(EntityDimensions.fixed(0.75f, 1.85f)).build());
+            FabricEntityTypeBuilder.create(SpawnGroup.CREATURE, WretchEntity::new)
+                    .dimensions(EntityDimensions.fixed(0.75f, 1.85f)).build());
 
-    private static<E extends LivingEntity> EntityType<E> add(String name, EntityType<E> entity) {
+    private static <E extends LivingEntity> EntityType<E> add(String name, EntityType<E> entity) {
         ENTITIES.add(new EntityEntry(BackroomsMod.id(name), entity));
         return entity;
     }
@@ -37,5 +39,6 @@ public class BackroomsEntities {
         FabricDefaultAttributeRegistry.register(HOUND, HoundEntity.createHoundAttributes());
     }
 
-    private record EntityEntry(Identifier identifier, EntityType<? extends LivingEntity> entity) {}
+    private record EntityEntry(Identifier identifier, EntityType<? extends LivingEntity> entity) {
+    }
 }

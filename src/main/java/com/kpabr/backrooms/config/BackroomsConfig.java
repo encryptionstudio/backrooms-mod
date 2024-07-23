@@ -6,7 +6,6 @@ import me.shedaniel.autoconfig.annotation.Config;
 import me.shedaniel.autoconfig.annotation.ConfigEntry;
 import me.shedaniel.autoconfig.serializer.GsonConfigSerializer;
 
-
 @Config.Gui.Background("backrooms:textures/block/patterned_wallpaper.png")
 @Config(name = "backrooms")
 public class BackroomsConfig implements ConfigData {

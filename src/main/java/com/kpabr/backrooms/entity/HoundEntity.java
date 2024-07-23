@@ -36,10 +36,10 @@ import java.util.Optional;
 import java.util.function.Consumer;
 
 public class HoundEntity extends PathAwareEntity implements GeoAnimatable {
-    private static final TrackedData<Integer> CURRENT_ANIMATION =
-            DataTracker.registerData(HoundEntity.class, TrackedDataHandlerRegistry.INTEGER);
-    private static final TrackedData<Optional<Text>> AI_TASK =
-            DataTracker.registerData(HoundEntity.class, TrackedDataHandlerRegistry.OPTIONAL_TEXT_COMPONENT);
+    private static final TrackedData<Integer> CURRENT_ANIMATION = DataTracker.registerData(HoundEntity.class,
+            TrackedDataHandlerRegistry.INTEGER);
+    private static final TrackedData<Optional<Text>> AI_TASK = DataTracker.registerData(HoundEntity.class,
+            TrackedDataHandlerRegistry.OPTIONAL_TEXT_COMPONENT);
 
     private final AnimatableInstanceCache cache = GeckoLibUtil.createInstanceCache(this);
     public final long uniqueId;
@@ -97,10 +97,11 @@ public class HoundEntity extends PathAwareEntity implements GeoAnimatable {
     public Text getName() {
         MutableText firstName = super.getName().copy();
 
-        if(BackroomsConfig.getInstance().aiDebug) {
+        if (BackroomsConfig.getInstance().aiDebug) {
             Text aiTask = this.getAiTask();
             firstName.append("; ");
-            if (aiTask != null) firstName.append(aiTask);
+            if (aiTask != null)
+                firstName.append(aiTask);
             return firstName;
         }
         return firstName;
@@ -116,16 +117,14 @@ public class HoundEntity extends PathAwareEntity implements GeoAnimatable {
     }
 
     private PlayState predicate(AnimationState<HoundEntity> event) {
-        AnimationEnum.values()[this.getAnimation()]
-                .animation.accept(event);
+        AnimationEnum.values()[this.getAnimation()].animation.accept(event);
 
         return PlayState.CONTINUE;
     }
 
     @Override
     public void registerControllers(ControllerRegistrar controllers) {
-        controllers.add(new AnimationController<>(this, "controller", 2, this::predicate)
-	);
+        controllers.add(new AnimationController<>(this, "controller", 2, this::predicate));
     }
 
     @Override
@@ -143,7 +142,6 @@ public class HoundEntity extends PathAwareEntity implements GeoAnimatable {
         return BackroomsSounds.HOUND_IDLE;
     }
 
-
     @Override
     public boolean isInvulnerableTo(DamageSource damageSource) {
         if (damageSource.isOf(DamageTypes.HOT_FLOOR)) {
@@ -151,6 +149,7 @@ public class HoundEntity extends PathAwareEntity implements GeoAnimatable {
         }
         return super.isInvulnerableTo(damageSource);
     }
+
     @Override
     public boolean damage(DamageSource source, float amount) {
         if (isInvulnerableTo(source)) {
@@ -158,7 +157,6 @@ public class HoundEntity extends PathAwareEntity implements GeoAnimatable {
         }
         return super.damage(source, amount);
     }
-
 
     public static enum AnimationEnum {
         IDLING((event) -> event.getController().setAnimation(
@@ -173,13 +171,11 @@ public class HoundEntity extends PathAwareEntity implements GeoAnimatable {
                 RawAnimation.begin().thenPlay("animation.hound.look")));
 
         private final Consumer<AnimationState<HoundEntity>> animation;
+
         AnimationEnum(Consumer<AnimationState<HoundEntity>> animation) {
             this.animation = animation;
         }
     }
-
-
-    
 
     @Override
     public AnimatableInstanceCache getAnimatableInstanceCache() {
@@ -191,4 +187,3 @@ public class HoundEntity extends PathAwareEntity implements GeoAnimatable {
         return RenderUtils.getCurrentTick();
     }
 }
-

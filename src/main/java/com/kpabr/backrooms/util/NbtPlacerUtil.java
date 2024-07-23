@@ -3,14 +3,11 @@ package com.kpabr.backrooms.util;
 import java.io.IOException;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 
 import org.apache.logging.log4j.util.TriConsumer;
 
-import com.kpabr.backrooms.BackroomsMod;
-import com.mojang.authlib.properties.Property;
 import com.mojang.datafixers.util.Pair;
 
 import net.minecraft.block.Block;
@@ -23,16 +20,9 @@ import net.minecraft.nbt.NbtHelper;
 import net.minecraft.nbt.NbtInt;
 import net.minecraft.nbt.NbtIo;
 import net.minecraft.nbt.NbtList;
-import net.minecraft.registry.Registries;
 import net.minecraft.registry.RegistryEntryLookup;
-import net.minecraft.registry.RegistryKey;
-import net.minecraft.registry.RegistryKeys;
-import net.minecraft.registry.RegistryOps;
-import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.resource.Resource;
 import net.minecraft.resource.ResourceManager;
-import net.minecraft.state.State;
-import net.minecraft.state.StateManager;
 import net.minecraft.util.BlockRotation;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
@@ -42,7 +32,7 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.chunk.Chunk;
 
 public class NbtPlacerUtil {
-    public final NbtCompound storedNbt;
+	public final NbtCompound storedNbt;
 	public final HashMap<BlockPos, Pair<BlockState, NbtCompound>> positions;
 	public final NbtList entities;
 	public final BlockPos lowestPos;
@@ -50,7 +40,8 @@ public class NbtPlacerUtil {
 	public final int sizeY;
 	public final int sizeZ;
 
-	public NbtPlacerUtil(NbtCompound storedNbt, HashMap<BlockPos, Pair<BlockState, NbtCompound>> positions, NbtList entities, BlockPos lowestPos, int sizeX, int sizeY, int sizeZ) {
+	public NbtPlacerUtil(NbtCompound storedNbt, HashMap<BlockPos, Pair<BlockState, NbtCompound>> positions,
+			NbtList entities, BlockPos lowestPos, int sizeX, int sizeY, int sizeZ) {
 		this.storedNbt = storedNbt;
 		this.positions = positions;
 		this.entities = entities;
@@ -60,31 +51,47 @@ public class NbtPlacerUtil {
 		this.sizeZ = sizeZ;
 	}
 
-	public NbtPlacerUtil(NbtCompound storedNbt, HashMap<BlockPos, Pair<BlockState, NbtCompound>> positions, NbtList entities, BlockPos lowestPos, BlockPos sizePos) {
+	public NbtPlacerUtil(NbtCompound storedNbt, HashMap<BlockPos, Pair<BlockState, NbtCompound>> positions,
+			NbtList entities, BlockPos lowestPos, BlockPos sizePos) {
 		this(storedNbt, positions, entities, lowestPos, sizePos.getX(), sizePos.getY(), sizePos.getZ());
 	}
 
 	public NbtPlacerUtil rotate(BlockRotation rotation, RegistryEntryLookup<Block> blockLookup) {
 		NbtList paletteList = storedNbt.getList("palette", 10);
 		HashMap<Integer, BlockState> palette = new HashMap<Integer, BlockState>(paletteList.size());
-		List<NbtCompound> paletteCompoundList = paletteList.stream().filter(nbtElement -> nbtElement instanceof NbtCompound).map(element -> (NbtCompound) element).toList();
+		List<NbtCompound> paletteCompoundList = paletteList.stream()
+				.filter(nbtElement -> nbtElement instanceof NbtCompound).map(element -> (NbtCompound) element).toList();
 		for (int i = 0; i < paletteCompoundList.size(); i++) {
 			palette.put(i, NbtHelper.toBlockState(blockLookup, paletteCompoundList.get(i)).rotate(rotation));
 		}
 
 		NbtList sizeList = storedNbt.getList("size", 3);
-		BlockPos sizeVectorRotated = new BlockPos(sizeList.getInt(0), sizeList.getInt(1), sizeList.getInt(2)).rotate(rotation);
-		BlockPos sizeVector = new BlockPos(Math.abs(sizeVectorRotated.getX()), Math.abs(sizeVectorRotated.getY()), Math.abs(sizeVectorRotated.getZ()));
+		BlockPos sizeVectorRotated = new BlockPos(sizeList.getInt(0), sizeList.getInt(1), sizeList.getInt(2))
+				.rotate(rotation);
+		BlockPos sizeVector = new BlockPos(Math.abs(sizeVectorRotated.getX()), Math.abs(sizeVectorRotated.getY()),
+				Math.abs(sizeVectorRotated.getZ()));
 
 		NbtList positionsList = storedNbt.getList("blocks", 10);
-		HashMap<BlockPos, Pair<BlockState, NbtCompound>> positions = new HashMap<BlockPos, Pair<BlockState, NbtCompound>>(positionsList.size());
-		List<Pair<BlockPos, Pair<BlockState, NbtCompound>>> positionsPairList = positionsList.stream().filter(nbtElement -> nbtElement instanceof NbtCompound).map(element -> (NbtCompound) element).map((nbtCompound) -> Pair.of(new BlockPos(nbtCompound.getList("pos", 3).getInt(0), nbtCompound.getList("pos", 3).getInt(1), nbtCompound.getList("pos", 3).getInt(2)).rotate(rotation), Pair.of(palette.get(nbtCompound.getInt("state")), nbtCompound.getCompound("nbt")))).sorted(Comparator.comparing((pair) -> pair.getFirst().getX())).sorted(Comparator.comparing((pair) -> pair.getFirst().getY())).sorted(Comparator.comparing((pair) -> pair.getFirst().getZ())).toList();
-		positionsPairList.forEach((pair) -> positions.put(pair.getFirst().subtract(positionsPairList.get(0).getFirst()), pair.getSecond()));
+		HashMap<BlockPos, Pair<BlockState, NbtCompound>> positions = new HashMap<BlockPos, Pair<BlockState, NbtCompound>>(
+				positionsList.size());
+		List<Pair<BlockPos, Pair<BlockState, NbtCompound>>> positionsPairList = positionsList.stream()
+				.filter(nbtElement -> nbtElement instanceof NbtCompound).map(element -> (NbtCompound) element)
+				.map((nbtCompound) -> Pair.of(
+						new BlockPos(nbtCompound.getList("pos", 3).getInt(0), nbtCompound.getList("pos", 3).getInt(1),
+								nbtCompound.getList("pos", 3).getInt(2)).rotate(rotation),
+						Pair.of(palette.get(nbtCompound.getInt("state")), nbtCompound.getCompound("nbt"))))
+				.sorted(Comparator.comparing((pair) -> pair.getFirst().getX()))
+				.sorted(Comparator.comparing((pair) -> pair.getFirst().getY()))
+				.sorted(Comparator.comparing((pair) -> pair.getFirst().getZ())).toList();
+		positionsPairList.forEach((pair) -> positions.put(pair.getFirst().subtract(positionsPairList.get(0).getFirst()),
+				pair.getSecond()));
 
-		return new NbtPlacerUtil(storedNbt, positions, storedNbt.getList("entities", 10), positionsPairList.get(0).getFirst(), sizeVector);
+		return new NbtPlacerUtil(storedNbt, positions, storedNbt.getList("entities", 10),
+				positionsPairList.get(0).getFirst(), sizeVector);
 	}
 
-	public static Optional<NbtPlacerUtil> load(ResourceManager manager, Identifier id, RegistryEntryLookup<Block> blockLookup) {
+	public static Optional<NbtPlacerUtil> load(ResourceManager manager, Identifier id,
+			RegistryEntryLookup<Block> blockLookup) {
 		try {
 			Optional<NbtCompound> nbtOptional = loadNbtFromFile(manager, id);
 			if (nbtOptional.isPresent()) {
@@ -92,21 +99,34 @@ public class NbtPlacerUtil {
 
 				NbtList paletteList = nbt.getList("palette", 10);
 				HashMap<Integer, BlockState> palette = new HashMap<Integer, BlockState>(paletteList.size());
-				List<NbtCompound> paletteCompoundList = paletteList.stream().filter(nbtElement -> nbtElement instanceof NbtCompound).map(element -> (NbtCompound) element).toList();
+				List<NbtCompound> paletteCompoundList = paletteList.stream()
+						.filter(nbtElement -> nbtElement instanceof NbtCompound).map(element -> (NbtCompound) element)
+						.toList();
 				for (int i = 0; i < paletteCompoundList.size(); i++) {
 					palette.put(i, NbtHelper.toBlockState(blockLookup, paletteCompoundList.get(i)));
 				}
 
 				NbtList sizeList = nbt.getList("size", 3);
 				BlockPos sizeVectorRotated = new BlockPos(sizeList.getInt(0), sizeList.getInt(1), sizeList.getInt(2));
-				BlockPos sizeVector = new BlockPos(Math.abs(sizeVectorRotated.getX()), Math.abs(sizeVectorRotated.getY()), Math.abs(sizeVectorRotated.getZ()));
+				BlockPos sizeVector = new BlockPos(Math.abs(sizeVectorRotated.getX()),
+						Math.abs(sizeVectorRotated.getY()), Math.abs(sizeVectorRotated.getZ()));
 
 				NbtList positionsList = nbt.getList("blocks", 10);
-				HashMap<BlockPos, Pair<BlockState, NbtCompound>> positions = new HashMap<BlockPos, Pair<BlockState, NbtCompound>>(positionsList.size());
-				List<Pair<BlockPos, Pair<BlockState, NbtCompound>>> positionsPairList = positionsList.stream().filter(nbtElement -> nbtElement instanceof NbtCompound).map(element -> (NbtCompound) element).map((nbtCompound) -> Pair.of(new BlockPos(nbtCompound.getList("pos", 3).getInt(0), nbtCompound.getList("pos", 3).getInt(1), nbtCompound.getList("pos", 3).getInt(2)), Pair.of(palette.get(nbtCompound.getInt("state")), nbtCompound.getCompound("nbt")))).sorted(Comparator.comparing((pair) -> pair.getFirst().getX())).sorted(Comparator.comparing((pair) -> pair.getFirst().getY())).sorted(Comparator.comparing((pair) -> pair.getFirst().getZ())).toList();
-				positionsPairList.forEach((pair) -> positions.put(pair.getFirst().subtract(positionsPairList.get(0).getFirst()), pair.getSecond()));
+				HashMap<BlockPos, Pair<BlockState, NbtCompound>> positions = new HashMap<BlockPos, Pair<BlockState, NbtCompound>>(
+						positionsList.size());
+				List<Pair<BlockPos, Pair<BlockState, NbtCompound>>> positionsPairList = positionsList.stream()
+						.filter(nbtElement -> nbtElement instanceof NbtCompound).map(element -> (NbtCompound) element)
+						.map((nbtCompound) -> Pair.of(new BlockPos(nbtCompound.getList("pos", 3).getInt(0),
+								nbtCompound.getList("pos", 3).getInt(1), nbtCompound.getList("pos", 3).getInt(2)),
+								Pair.of(palette.get(nbtCompound.getInt("state")), nbtCompound.getCompound("nbt"))))
+						.sorted(Comparator.comparing((pair) -> pair.getFirst().getX()))
+						.sorted(Comparator.comparing((pair) -> pair.getFirst().getY()))
+						.sorted(Comparator.comparing((pair) -> pair.getFirst().getZ())).toList();
+				positionsPairList.forEach((pair) -> positions
+						.put(pair.getFirst().subtract(positionsPairList.get(0).getFirst()), pair.getSecond()));
 
-				return Optional.of(new NbtPlacerUtil(nbt, positions, nbt.getList("entities", 10), positionsPairList.get(0).getFirst(), sizeVector));
+				return Optional.of(new NbtPlacerUtil(nbt, positions, nbt.getList("entities", 10),
+						positionsPairList.get(0).getFirst(), sizeVector));
 			}
 
 			throw new NullPointerException();
@@ -130,7 +150,8 @@ public class NbtPlacerUtil {
 		return nbt;
 	}
 
-	public NbtPlacerUtil generateNbt(Chunk region, BlockPos at, TriConsumer<BlockPos, BlockState, NbtCompound> consumer) {
+	public NbtPlacerUtil generateNbt(Chunk region, BlockPos at,
+			TriConsumer<BlockPos, BlockState, NbtCompound> consumer) {
 		for (int xi = 0; xi < this.sizeX; xi++) {
 			for (int yi = 0; yi < this.sizeY; yi++) {
 				for (int zi = 0; zi < this.sizeZ; zi++) {
@@ -148,7 +169,8 @@ public class NbtPlacerUtil {
 		this.entities.forEach((nbtElement) -> {
 			NbtCompound entityCompound = (NbtCompound) nbtElement;
 			NbtList nbtPos = entityCompound.getList("blockPos", 3);
-			Vec3d realPosition = rotate(new Vec3d(nbtPos.getInt(0), nbtPos.getInt(1), nbtPos.getInt(2)), rotation).subtract(Vec3d.of(lowestPos)).add(pos.getX(), pos.getY(), pos.getZ());
+			Vec3d realPosition = rotate(new Vec3d(nbtPos.getInt(0), nbtPos.getInt(1), nbtPos.getInt(2)), rotation)
+					.subtract(Vec3d.of(lowestPos)).add(pos.getX(), pos.getY(), pos.getZ());
 
 			NbtCompound nbt = entityCompound.getCompound("nbt").copy();
 			nbt.remove("Pos");
@@ -177,46 +199,45 @@ public class NbtPlacerUtil {
 		return this;
 	}
 
-
 	public static Vec3d rotate(Vec3d in, BlockRotation rotation) {
 		switch (rotation) {
-		case NONE:
-		default:
-			return in;
-		case CLOCKWISE_90:
-			return new Vec3d(-in.getZ(), in.getY(), in.getX());
-		case CLOCKWISE_180:
-			return new Vec3d(-in.getX(), in.getY(), -in.getZ());
-		case COUNTERCLOCKWISE_90:
-			return new Vec3d(in.getZ(), in.getY(), -in.getX());
+			case NONE:
+			default:
+				return in;
+			case CLOCKWISE_90:
+				return new Vec3d(-in.getZ(), in.getY(), in.getX());
+			case CLOCKWISE_180:
+				return new Vec3d(-in.getX(), in.getY(), -in.getZ());
+			case COUNTERCLOCKWISE_90:
+				return new Vec3d(in.getZ(), in.getY(), -in.getX());
 		}
 	}
 
 	public static BlockPos rotate(BlockPos in, BlockRotation rotation) {
 		switch (rotation) {
-		case NONE:
-		default:
-			return in;
-		case CLOCKWISE_90:
-			return new BlockPos(-in.getZ(), in.getY(), in.getX());
-		case CLOCKWISE_180:
-			return new BlockPos(-in.getX(), in.getY(), -in.getZ());
-		case COUNTERCLOCKWISE_90:
-			return new BlockPos(in.getZ(), in.getY(), -in.getX());
+			case NONE:
+			default:
+				return in;
+			case CLOCKWISE_90:
+				return new BlockPos(-in.getZ(), in.getY(), in.getX());
+			case CLOCKWISE_180:
+				return new BlockPos(-in.getX(), in.getY(), -in.getZ());
+			case COUNTERCLOCKWISE_90:
+				return new BlockPos(in.getZ(), in.getY(), -in.getX());
 		}
 	}
 
 	public float applyRotation(float in, BlockRotation rotation) {
 		float f = MathHelper.wrapDegrees(in);
 		switch (rotation) {
-		case CLOCKWISE_180:
-			return f + 180.0F;
-		case COUNTERCLOCKWISE_90:
-			return f + 270.0F;
-		case CLOCKWISE_90:
-			return f + 90.0F;
-		default:
-			return f;
+			case CLOCKWISE_180:
+				return f + 180.0F;
+			case COUNTERCLOCKWISE_90:
+				return f + 270.0F;
+			case CLOCKWISE_90:
+				return f + 90.0F;
+			default:
+				return f;
 		}
 	}
 
